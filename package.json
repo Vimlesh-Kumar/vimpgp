@@ -11,9 +11,6 @@
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
-    "@oxc-minify/binding-darwin-arm64": "^0.105.0",
-    "@oxc-parser/binding-darwin-arm64": "^0.105.0",
-    "@oxc-transform/binding-darwin-arm64": "^0.105.0",
     "nuxt": "^4.2.2",
     "openpgp": "^6.3.0",
     "sass": "^1.97.1",
