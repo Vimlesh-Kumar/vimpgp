@@ -25,5 +25,8 @@ export default defineNuxtConfig({
         transformAssetUrls,
       },
     },
+    optimizeDeps: {
+      exclude: ['openpgp']
+    }
   },
 })
