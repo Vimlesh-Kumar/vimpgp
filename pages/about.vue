@@ -8,7 +8,7 @@
           </v-avatar>
           <div class="d-flex align-center justify-center mb-2">
             <v-chip color="primary" variant="tonal" size="x-small" class="font-weight-black px-3" rounded="lg">
-              V1.0.0 STABLE
+              V{{ config.public.version }} STABLE
             </v-chip>
           </div>
           <h1 class="text-h2 font-weight-black text-white tracking-tighter mb-4">About <span class="text-gradient">VimPGP</span></h1>
@@ -81,6 +81,8 @@
 </template>
 
 <script setup>
+const config = useRuntimeConfig()
+
 useHead({
   title: 'About - VimPGP'
 })

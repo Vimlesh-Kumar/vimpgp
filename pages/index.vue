@@ -4,12 +4,15 @@
     <v-row>
       <v-col cols="12" md="4" lg="3">
         <div class="sticky-top pt-2">
-          <h1 class="text-h3 font-weight-black mb-2 tracking-tighter">
-            <span class="text-white">Secure PGP</span> <br/>
-            <span class="text-gradient">Manager</span>
+          <h1 class="text-h3 font-weight-black mb-3 tracking-tighter shadow-text">
+            <span class="text-white">VIM</span><span class="text-gradient">PGP</span>
           </h1>
-          <p class="text-body-2 text-medium-emphasis mb-6">
-            Military-grade encryption, simplified for the modern web. 100% client-side.
+          <p class="text-body-2 text-medium-emphasis mb-6 line-height-relaxed">
+            VimPGP is an <strong>Open Source</strong>, free, online and secure PGP key generator. 
+            All code runs on the client-side using the <strong>OpenPGP.js</strong> library. 
+            <br/><br/>
+            No servers. No tracking. Feel free to <strong>unplug the Internet</strong> before use. 
+            Check our <NuxtLink to="/faq" class="text-primary font-weight-bold text-decoration-none">FAQ</NuxtLink> for more information.
           </p>
 
           <v-divider class="mb-6" style="opacity: 0.1"/>

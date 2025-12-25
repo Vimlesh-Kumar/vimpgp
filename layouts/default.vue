@@ -3,9 +3,9 @@
     <v-app-bar flat class="glass-effect header-border" height="75">
       <template #prepend>
         <NuxtLink to="/" class="text-decoration-none d-flex align-center ml-4 cursor-pointer hover-scale">
-          <v-btn icon color="primary" variant="tonal" size="44" class="mr-3 rounded-lg border-primary shadow-glow">
-            <v-icon icon="mdi-shield-lock" size="24"/>
-          </v-btn>
+          <v-avatar size="44" class="mr-3 rounded-lg border-primary shadow-glow overflow-hidden">
+            <v-img src="/logo.png" cover alt="VimPGP Logo"/>
+          </v-avatar>
           <div class="d-none d-md-block">
             <div class="text-h5 font-weight-black tracking-tighter d-flex align-center">
               <span class="text-white">VIM</span><span class="text-gradient">PGP</span>

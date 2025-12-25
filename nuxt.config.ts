@@ -1,9 +1,16 @@
 import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
+import pkg from './package.json'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+
+  runtimeConfig: {
+    public: {
+      version: pkg.version
+    }
+  },
 
   // Standard production settings (Working for Vercel/Netlify)
   ssr: false,
@@ -11,6 +18,11 @@ export default defineNuxtConfig({
   app: {
     baseURL: '/',
     buildAssetsDir: 'assets',
+    head: {
+      link: [
+        { rel: 'icon', type: 'image/png', href: '/logo.png' }
+      ]
+    }
   },
 
   build: {
