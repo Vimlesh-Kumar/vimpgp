@@ -4,6 +4,15 @@ import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+
+  // Standard production settings (Working for Vercel/Netlify)
+  ssr: false,
+
+  app: {
+    baseURL: '/',
+    buildAssetsDir: 'assets',
+  },
+
   build: {
     transpile: ['vuetify'],
   },
