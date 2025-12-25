@@ -16,9 +16,9 @@
        <v-btn color="primary" size="large" to="/generate" prepend-icon="mdi-creation" elevation="8">Generate Key Pair</v-btn>
     </div>
 
-    <v-row v-else>
-      <v-col v-for="key in keys" :key="key.id" cols="12" md="6">
-        <v-card class="glass-card pa-0 h-100 d-flex flex-column transition-swing" hover>
+    <v-row v-else class="g-6 align-stretch">
+      <v-col v-for="key in keys" :key="key.id" cols="12" md="6" class="d-flex">
+        <v-card class="glass-card pa-0 w-100 d-flex flex-column transition-swing" hover>
           <div class="pa-5 pb-3">
             <div class="d-flex align-start justify-space-between mb-3">
                <div class="d-flex align-center">

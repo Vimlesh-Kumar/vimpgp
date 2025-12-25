@@ -47,7 +47,7 @@
         <div class="blob blob-2"/>
          <div class="blob blob-3"/>
       </div>
-      <v-container class="fill-height align-start pt-10" style="max-width: 1200px; position: relative; z-index: 1;">
+      <v-container class="align-start pt-10" style="max-width: 1300px; position: relative; z-index: 1;">
         <slot />
       </v-container>
     </v-main>
