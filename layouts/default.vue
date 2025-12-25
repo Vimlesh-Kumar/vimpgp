@@ -1,42 +1,65 @@
 <template>
   <v-app class="app-container">
-    <v-app-bar flat class="glass-effect" height="70">
+    <v-app-bar flat class="glass-effect header-border" height="75">
       <template #prepend>
-        <div class="d-flex align-center ml-4">
-          <v-icon icon="mdi-shield-lock-outline" size="32" color="primary" class="mr-2"/>
-          <div class="text-h5 font-weight-bold tracking-wide">
-            <span class="text-white">Vim</span><span class="text-gradient">PGP</span>
+        <NuxtLink to="/" class="text-decoration-none d-flex align-center ml-4 cursor-pointer hover-scale">
+          <v-btn icon color="primary" variant="tonal" size="44" class="mr-3 rounded-lg border-primary shadow-glow">
+            <v-icon icon="mdi-shield-lock" size="24"/>
+          </v-btn>
+          <div class="d-none d-md-block">
+            <div class="text-h5 font-weight-black tracking-tighter d-flex align-center">
+              <span class="text-white">VIM</span><span class="text-gradient">PGP</span>
+            </div>
+            <div class="text-caption text-disabled font-weight-bold mt-n1 uppercase tracking-widest">
+              Secure Keyring
+            </div>
           </div>
-        </div>
+        </NuxtLink>
       </template>
+
+      <v-divider vertical inset class="mx-6 d-none d-lg-block" style="opacity: 0.1"/>
+
+      <div class="d-none d-lg-flex align-center">
+        <v-chip size="small" variant="tonal" color="success" class="font-weight-black px-4 status-badge shadow-success">
+          <div class="status-dot mr-2"></div>
+          CLIENT-SIDE SECURE
+        </v-chip>
+      </div>
 
       <v-spacer/>
 
-      <div class="d-none d-sm-flex align-center mr-4">
-        <v-btn
-          prepend-icon="mdi-view-dashboard-outline"
-          to="/"
-          variant="text"
-          class="text-body-1"
-          rounded="lg"
-        >Dashboard</v-btn>
-        
-        <v-btn
-          prepend-icon="mdi-key-plus"
-          to="/generate"
-          variant="text"
-          class="text-body-1 mx-2"
-           rounded="lg"
-        >Generate</v-btn>
-        
+      <div class="d-flex align-center mr-4">
+        <v-tabs v-model="activeTab" bg-color="transparent" color="primary" density="compact" hide-slider class="nav-tabs d-none d-sm-flex">
+          <v-tab to="/" value="dashboard" rounded="lg" class="px-4 text-none font-weight-bold">
+            <v-icon start size="18" class="mr-2">mdi-view-dashboard</v-icon>
+            Dashboard
+          </v-tab>
+          <v-tab to="/generate" value="generate" rounded="lg" class="px-4 text-none font-weight-bold">
+            <v-icon start size="18" class="mr-2">mdi-key-plus</v-icon>
+            Generate
+          </v-tab>
+          <v-tab to="/about" value="about" rounded="lg" class="px-4 text-none font-weight-bold">
+            <v-icon start size="18" class="mr-2">mdi-information</v-icon>
+            About
+          </v-tab>
+          <v-tab to="/faq" value="faq" rounded="lg" class="px-4 text-none font-weight-bold">
+            <v-icon start size="18" class="mr-2">mdi-help-circle</v-icon>
+            FAQ
+          </v-tab>
+        </v-tabs>
+
+        <v-divider vertical inset class="mx-4 d-none d-sm-block" style="opacity: 0.1"/>
+
         <v-btn
            icon
-           variant="text"
-           href="https://github.com/Vimlesh-Kumar"
+           variant="tonal"
+           size="40"
+           href="https://github.com/Vimlesh-Kumar/vimpgp"
            target="_blank"
            title="View on GitHub"
+           class="glass-panel-btn border-1"
         >
-          <v-icon>mdi-github</v-icon>
+          <v-icon size="22">mdi-github</v-icon>
         </v-btn>
       </div>
     </v-app-bar>
@@ -60,7 +83,53 @@
   </v-app>
 </template>
 
+<script setup>
+import { ref } from 'vue'
+const activeTab = ref(null)
+</script>
+
 <style scoped>
+.header-border {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.hover-scale {
+  transition: transform 0.2s ease-in-out;
+}
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+.border-primary {
+  border: 1px solid rgba(0, 229, 255, 0.3) !important;
+}
+
+.tracking-tighter {
+  letter-spacing: -1px;
+}
+.tracking-widest {
+  letter-spacing: 2px;
+}
+.uppercase {
+  text-transform: uppercase;
+}
+
+.glass-panel-btn {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.nav-tabs :deep(.v-tab) {
+  min-width: 100px;
+  transition: all 0.2s ease;
+  opacity: 0.7;
+}
+
+.nav-tabs :deep(.v-tab--selected) {
+  background: rgba(var(--v-theme-primary), 0.1);
+  opacity: 1;
+}
+
 .app-container {
   background: transparent !important;
 }

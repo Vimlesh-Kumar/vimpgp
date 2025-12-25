@@ -1,16 +1,49 @@
 <template>
   <div class="py-6">
-    <div class="mb-10">
-      <h1 class="text-h3 font-weight-bold mb-3">
-        <span class="text-white">Secure PGP</span> <span class="text-gradient">Manager</span>
-      </h1>
-      <p class="text-subtitle-1 text-medium-emphasis" style="max-width: 600px; line-height: 1.6">
-        Generate, manage, and use OpenPGP keys securely within your browser. 
-        Your private keys never leave your device.
-      </p>
-    </div>
-    
-    <KeyList />
+    <!-- Hero Section -->
+    <v-row>
+      <v-col cols="12" md="4" lg="3">
+        <div class="sticky-top pt-2">
+          <h1 class="text-h3 font-weight-black mb-2 tracking-tighter">
+            <span class="text-white">Secure PGP</span> <br/>
+            <span class="text-gradient">Manager</span>
+          </h1>
+          <p class="text-body-2 text-medium-emphasis mb-6">
+            Military-grade encryption, simplified for the modern web. 100% client-side.
+          </p>
+
+          <v-divider class="mb-6" style="opacity: 0.1"/>
+
+          <div class="mb-8">
+            <div class="d-flex align-center justify-space-between mb-3 text-caption">
+              <span class="text-disabled font-weight-bold uppercase tracking-widest">Privacy</span>
+              <span class="text-success font-weight-black">100% SECURE</span>
+            </div>
+            <div class="d-flex align-center justify-space-between mb-3 text-caption">
+              <span class="text-disabled font-weight-bold uppercase tracking-widest">Performance</span>
+              <span class="text-white font-weight-black">ZERO LATENCY</span>
+            </div>
+            <div class="d-flex align-center justify-space-between text-caption">
+              <span class="text-disabled font-weight-bold uppercase tracking-widest">Engine</span>
+              <span class="text-white font-weight-black">OPENPGP.JS</span>
+            </div>
+          </div>
+
+          <v-btn block color="primary" size="large" to="/generate" prepend-icon="mdi-plus" class="font-weight-black rounded-xl mb-4 shadow-glow">
+            Generate Key
+          </v-btn>
+
+          <div class="glass-card pa-4 rounded-xl text-caption border-primary mb-6">
+            <v-icon size="16" color="primary" class="mr-1">mdi-shield-check</v-icon>
+            Your keys never leave your physical device. No servers. No tracking.
+          </div>
+        </div>
+      </v-col>
+
+      <v-col cols="12" md="8" lg="9">
+        <KeyList />
+      </v-col>
+    </v-row>
   </div>
 </template>
 
@@ -19,3 +52,47 @@ useHead({
   title: 'Dashboard - VimPGP'
 })
 </script>
+
+<style scoped>
+.border-l-primary {
+  border-left: 4px solid var(--v-theme-primary);
+}
+
+.hero-image-stack {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.floating-card-1 {
+  position: absolute;
+  top: -20px;
+  left: 20px;
+  z-index: 2;
+  animation: float 6s infinite ease-in-out;
+}
+
+.floating-card-2 {
+  position: absolute;
+  bottom: -20px;
+  right: 20px;
+  z-index: 2;
+  animation: float 6s infinite ease-in-out -3s;
+}
+
+.hover-border-primary {
+  transition: all 0.3s ease;
+}
+
+.hover-border-primary:hover {
+  border-color: rgba(var(--v-theme-primary), 0.5) !important;
+  transform: translateY(-5px);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+</style>

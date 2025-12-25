@@ -22,6 +22,31 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* Typography Utilities */
+.tracking-tighter {
+  letter-spacing: -1.5px !important;
+}
+
+.tracking-wide {
+  letter-spacing: 1px !important;
+}
+
+.tracking-widest {
+  letter-spacing: 3px !important;
+}
+
+.uppercase {
+  text-transform: uppercase !important;
+}
+
+.font-mono {
+  font-family: 'Roboto Mono', monospace !important;
+}
+
+.scroll-mt-20 {
+  scroll-margin-top: 100px;
+}
+
 .glass-card {
   background: rgba(30, 30, 30, 0.4) !important;
   backdrop-filter: blur(20px);
@@ -81,4 +106,69 @@ body {
 
 .v-list {
   background: transparent !important;
+}
+
+/* Expansion Panels / FAQ */
+.faq-panels .v-expansion-panel {
+  background: rgba(30, 30, 30, 0.4) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.2);
+}
+
+.faq-panels .v-expansion-panel-title {
+  color: #fff !important;
+}
+
+.faq-panels .v-expansion-panel-text {
+  background: rgba(0, 0, 0, 0.2) !important;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.sticky-top {
+  position: sticky;
+  top: 100px;
+}
+
+.shadow-glow {
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.2) !important;
+}
+
+.shadow-success {
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.2) !important;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #4CAF50;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #4CAF50;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.status-badge {
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(76, 175, 80, 0.2) !important;
 }
