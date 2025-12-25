@@ -50,9 +50,9 @@
                  </td>
                  <td>
                      <div class="d-flex align-center">
-                         <v-icon v-if="subkey.isPrimary || subkey.type ==='certify' || subkey.type === 'sign'" icon="mdi-shield-account" size="small" color="secondary" class="mr-2"></v-icon>
-                         <v-icon v-else-if="subkey.type === 'encrypt'" icon="mdi-shield-lock" size="small" color="secondary" class="mr-2"></v-icon>
-                         <v-icon v-else icon="mdi-shield-check" size="small" color="secondary" class="mr-2"></v-icon>
+                         <v-icon v-if="subkey.isPrimary || subkey.type ==='certify' || subkey.type === 'sign'" icon="mdi-shield-account" size="small" color="secondary" class="mr-2"/>
+                         <v-icon v-else-if="subkey.type === 'encrypt'" icon="mdi-shield-lock" size="small" color="secondary" class="mr-2"/>
+                         <v-icon v-else icon="mdi-shield-check" size="small" color="secondary" class="mr-2"/>
                          <span class="text-capitalize">{{ subkey.type || 'Unknown' }}</span>
                      </div>
                  </td>
@@ -66,7 +66,7 @@
           
            <div class="mt-6 text-center">
               <v-dialog v-model="showAddSubkey" max-width="500">
-                <template v-slot:activator="{ props }">
+                <template #activator="{ props }">
                   <v-btn v-bind="props" variant="outlined" color="primary" prepend-icon="mdi-plus">Add Subkey</v-btn>
                 </template>
                 <v-card class="glass-card">
@@ -78,7 +78,7 @@
                       :items="[{title: 'Signing Key', value: 'sign'}, {title: 'Encryption Key', value: 'encrypt'}, {title: 'Authentication Key', value: 'auth'}]"
                       variant="solo-filled"
                       menu-props="{ contentClass: 'glass-panel' }"
-                    ></v-select>
+                    />
                     
                     <v-select
                       v-model="subkeyForm.algo"
@@ -86,7 +86,7 @@
                       :items="[{title: 'ECC', value: 'ecc'}, {title: 'RSA', value: 'rsa'}]"
                       variant="solo-filled"
                       menu-props="{ contentClass: 'glass-panel' }"
-                    ></v-select>
+                    />
                     
                      <v-select
                       v-if="subkeyForm.algo === 'ecc'"
@@ -95,7 +95,7 @@
                       :items="[{title: 'Curve25519', value: 25519}, {title: 'NIST P-256', value: 256}, {title: 'NIST P-384', value: 384}, {title: 'NIST P-521', value: 521}]"
                       variant="solo-filled"
                       menu-props="{ contentClass: 'glass-panel' }"
-                    ></v-select>
+                    />
 
                     <v-select
                       v-if="subkeyForm.algo === 'rsa'"
@@ -110,7 +110,7 @@
                       ]"
                       variant="solo-filled"
                       menu-props="{ contentClass: 'glass-panel' }"
-                    ></v-select>
+                    />
 
                     <v-select
                       v-model="subkeyForm.expiry"
@@ -127,7 +127,7 @@
                       ]"
                       variant="solo-filled"
                       menu-props="{ contentClass: 'glass-panel' }"
-                    ></v-select>
+                    />
                     
                     <v-text-field
                       v-model="subkeyForm.passphrase"
@@ -136,12 +136,12 @@
                       variant="solo-filled"
                       hint="Required to sign the new subkey"
                       persistent-hint
-                    ></v-text-field>
+                    />
                   </v-card-text>
                   <v-card-actions>
-                    <v-spacer></v-spacer>
+                    <v-spacer/>
                     <v-btn color="white" variant="text" @click="showAddSubkey = false">Cancel</v-btn>
-                    <v-btn color="primary" @click="handleAddSubkey" :loading="subkeyLoading">Generate Subkey</v-btn>
+                    <v-btn color="primary" :loading="subkeyLoading" @click="handleAddSubkey">Generate Subkey</v-btn>
                   </v-card-actions>
                 </v-card>
               </v-dialog>
@@ -157,7 +157,7 @@
              Make sure you have a backup.
            </p>
            <v-dialog v-model="showDeleteConfirm" max-width="400">
-               <template v-slot:activator="{ props }">
+               <template #activator="{ props }">
                     <v-btn v-bind="props" color="error" block variant="outlined" prepend-icon="mdi-delete">Delete Key Pair</v-btn>
                </template>
                <v-card class="glass-card">
@@ -166,7 +166,7 @@
                        Are you sure you want to delete this key pair? This action cannot be undone.
                    </v-card-text>
                    <v-card-actions>
-                       <v-spacer></v-spacer>
+                       <v-spacer/>
                        <v-btn color="white" variant="text" @click="showDeleteConfirm = false">Cancel</v-btn>
                        <v-btn color="error" @click="handleDeleteConfirm">Confirm Delete</v-btn>
                    </v-card-actions>
@@ -177,7 +177,7 @@
     </v-row>
   </div>
   <div v-else class="py-12 text-center">
-    <v-progress-circular indeterminate color="primary"></v-progress-circular>
+    <v-progress-circular indeterminate color="primary"/>
     <div class="mt-4">Loading or Key not found...</div>
   </div>
 </template>
@@ -186,10 +186,10 @@
 import { computed, ref, onMounted, reactive, watch } from 'vue'
 const route = useRoute()
 const router = useRouter()
-const { keys, deleteKey, initKeys, getKeyDetails, generateSubkey, loading } = usePgp()
+const { keys, deleteKey, initKeys, getKeyDetails, generateSubkey } = usePgp()
 
 const subkeys = ref([])
-const activeTab = ref('details')
+
 const showAddSubkey = ref(false)
 const showDeleteConfirm = ref(false)
 const subkeyForm = reactive({

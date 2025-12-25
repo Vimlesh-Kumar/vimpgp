@@ -10,7 +10,8 @@ export interface PgpKeyRecord {
     revocationCertificate: string;
     createdAt: string;
     type: string;
-    subkeys?: Array<any>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    subkeys?: any[];
 }
 
 export const usePgp = () => {
@@ -18,7 +19,7 @@ export const usePgp = () => {
     const loading = useState<boolean>('pgp-loading', () => false);
 
     const initKeys = () => {
-        if (process.client) {
+        if (import.meta.client) {
             const stored = localStorage.getItem('vimpgp_keys');
             if (stored) {
                 try {
@@ -31,7 +32,7 @@ export const usePgp = () => {
     };
 
     const saveKeys = () => {
-        if (process.client) {
+        if (import.meta.client) {
             localStorage.setItem('vimpgp_keys', JSON.stringify(keys.value));
         }
     };
@@ -39,20 +40,16 @@ export const usePgp = () => {
     const generate = async (name: string, email: string, passphrase: string, keyType: 'ecc' | 'rsa' = 'ecc', keySize: number = 0, expiry: number = 0) => {
         loading.value = true;
         try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const options: any = {
                 userIDs: [{ name, email }],
                 passphrase,
                 format: 'armored',
-                keyExpirationTime: expiry
+                keyExpirationTime: expiry,
+                type: keyType === 'ecc' ? 'ecc' : 'rsa',
+                curve: keyType === 'ecc' ? ((keySize === 0 || keySize === 25519) ? 'curve25519' : (keySize === 256 ? 'p256' : (keySize === 384 ? 'p384' : (keySize === 521 ? 'p521' : 'curve25519')))) : undefined,
+                rsaBits: keyType === 'rsa' ? (keySize === 0 ? 4096 : keySize) : undefined
             };
-
-            if (keyType === 'ecc') {
-                options.type = 'ecc';
-                options.curve = (keySize === 0 || keySize === 25519) ? 'curve25519' : (keySize === 256 ? 'p256' : (keySize === 384 ? 'p384' : 'p521'));
-            } else {
-                options.type = 'rsa';
-                options.rsaBits = keySize === 0 ? 4096 : keySize;
-            }
 
             const { privateKey, publicKey, revocationCertificate } = await openpgp.generateKey(options);
 
@@ -70,15 +67,13 @@ export const usePgp = () => {
                 revocationCertificate,
                 createdAt: new Date().toISOString(),
                 type: keyType,
-                subkeys: [] // Initialize empty subkeys array
+                subkeys: []
             };
 
             keys.value.push(newKey);
             saveKeys();
 
             return newKey;
-        } catch (e) {
-            throw e;
         } finally {
             loading.value = false;
         }
@@ -89,8 +84,7 @@ export const usePgp = () => {
         saveKeys();
     };
 
-    const generateSubkey = async (keyId: string, passphrase: string, type: 'sign' | 'encrypt' | 'auth', algo: 'rsa' | 'ecc' = 'ecc', size: number = 25519, expiry: number = 0) => {
-        // Simulated for MVP but persisting metadata
+    const generateSubkey = async (keyId: string, _passphrase: string, type: 'sign' | 'encrypt' | 'auth', algo: 'rsa' | 'ecc' = 'ecc', size: number = 25519, expiry: number = 0) => {
         loading.value = true;
         try {
             await new Promise(r => setTimeout(r, 800));
@@ -110,13 +104,13 @@ export const usePgp = () => {
                 expiry: expiry > 0 ? new Date(Date.now() + expiry * 1000).toISOString() : null
             };
 
-            if (!keys.value[keyIndex].subkeys) keys.value[keyIndex].subkeys = [];
-            keys.value[keyIndex].subkeys.push(newSubkey);
+            const currentKey = keys.value[keyIndex];
+            if (!currentKey) throw new Error("Key record missing");
+            if (!currentKey.subkeys) currentKey.subkeys = [];
+            currentKey.subkeys.push(newSubkey);
             saveKeys();
 
             return true;
-        } catch (e) {
-            throw e;
         } finally {
             loading.value = false;
         }
@@ -124,7 +118,8 @@ export const usePgp = () => {
 
     const getKeyDetails = async (armoredKey: string) => {
         const key = await openpgp.readKey({ armoredKey });
-        const allKeys = [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const allKeys: any[] = [];
 
         // Primary
         const pInfo = key.getAlgorithmInfo();
@@ -143,10 +138,7 @@ export const usePgp = () => {
             expiry: null
         });
 
-        // Real Subkeys
-        // @ts-expect-error subkeys property check
         if (key.subkeys) {
-            // @ts-expect-error subkeys iteration
             for (const sub of key.subkeys) {
                 const pkt = sub.keyPacket;
                 allKeys.push({

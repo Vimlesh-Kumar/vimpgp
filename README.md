@@ -102,6 +102,16 @@ npm run generate
 - **Cryptography**: [OpenPGP.js](https://openpgpjs.org/)
 - **Icons**: [Material Design Icons](https://materialdesignicons.com/)
 - **Styling**: Custom CSS with Glassmorphism
+- **Linting**: [ESLint](https://eslint.org/) with [Nuxt ESLint Module](https://eslint.nuxt.com/)
+
+## 🛠️ Development & Linting
+
+To ensure code quality and consistency, this project uses ESLint.
+
+- **Check for issues**: `npm run lint`
+- **Fix issues automatically**: `npm run lint:fix`
+
+For more detailed information, see the [Linting Guide](./LINTING.md).
 
 ## 📖 Usage
 

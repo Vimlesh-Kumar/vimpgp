@@ -9,6 +9,7 @@ export default defineNuxtConfig({
   },
   css: ['~/assets/css/main.css'],
   modules: [
+    '@nuxt/eslint',
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
         // @ts-expect-error plugin type mismatch

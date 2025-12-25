@@ -1,16 +1,16 @@
 <template>
   <v-app class="app-container">
     <v-app-bar flat class="glass-effect" height="70">
-      <template v-slot:prepend>
+      <template #prepend>
         <div class="d-flex align-center ml-4">
-          <v-icon icon="mdi-shield-lock-outline" size="32" color="primary" class="mr-2"></v-icon>
+          <v-icon icon="mdi-shield-lock-outline" size="32" color="primary" class="mr-2"/>
           <div class="text-h5 font-weight-bold tracking-wide">
             <span class="text-white">Vim</span><span class="text-gradient">PGP</span>
           </div>
         </div>
       </template>
 
-      <v-spacer></v-spacer>
+      <v-spacer/>
 
       <div class="d-none d-sm-flex align-center mr-4">
         <v-btn
@@ -43,9 +43,9 @@
 
     <v-main>
       <div class="background-blobs">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-         <div class="blob blob-3"></div>
+        <div class="blob blob-1"/>
+        <div class="blob blob-2"/>
+         <div class="blob blob-3"/>
       </div>
       <v-container class="fill-height align-start pt-10" style="max-width: 1200px; position: relative; z-index: 1;">
         <slot />

@@ -7,7 +7,7 @@
     
     <div v-if="keys.length === 0" class="text-center py-16 glass-card rounded-xl border-dashed">
        <v-avatar color="surface" size="80" class="mb-4 elevation-4">
-         <v-icon icon="mdi-shield-key-outline" size="40" color="primary"></v-icon>
+         <v-icon icon="mdi-shield-key-outline" size="40" color="primary"/>
        </v-avatar>
        <div class="text-h5 font-weight-bold mb-2">No keys found</div>
        <div class="text-body-1 text-medium-emphasis mb-8" style="max-width: 400px; margin: 0 auto;">
@@ -17,7 +17,7 @@
     </div>
 
     <v-row v-else>
-      <v-col cols="12" md="6" v-for="key in keys" :key="key.id">
+      <v-col v-for="key in keys" :key="key.id" cols="12" md="6">
         <v-card class="glass-card pa-0 h-100 d-flex flex-column transition-swing" hover>
           <div class="pa-5 pb-3">
             <div class="d-flex align-start justify-space-between mb-3">
@@ -35,7 +35,7 @@
                </v-chip>
             </div>
             
-            <v-divider class="my-3"></v-divider>
+            <v-divider class="my-3"/>
             
             <div class="bg-surface-lighten-1 rounded pa-3 mb-2">
                <div class="d-flex justify-space-between text-body-2 mb-2">
@@ -57,31 +57,31 @@
             </div>
           </div>
 
-          <v-divider></v-divider>
+          <v-divider/>
 
           <v-card-actions class="pa-3 bg-black-alpha-10">
             <v-tooltip text="Copy Public Key" location="top">
-              <template v-slot:activator="{ props }">
-                 <v-btn v-bind="props" size="small" variant="text" color="primary" icon="mdi-share-variant" @click="copy(key.publicKey, 'Public Key')"></v-btn>
+              <template #activator="{ props }">
+                 <v-btn v-bind="props" size="small" variant="text" color="primary" icon="mdi-share-variant" @click="copy(key.publicKey, 'Public Key')"/>
               </template>
             </v-tooltip>
             
             <v-tooltip text="Copy Private Key" location="top">
-              <template v-slot:activator="{ props }">
-                <v-btn v-bind="props" size="small" variant="text" color="secondary" icon="mdi-shield-key" @click="copy(key.privateKey, 'Private Key')"></v-btn>
+              <template #activator="{ props }">
+                <v-btn v-bind="props" size="small" variant="text" color="secondary" icon="mdi-shield-key" @click="copy(key.privateKey, 'Private Key')"/>
               </template>
             </v-tooltip>
 
-            <v-spacer></v-spacer>
+            <v-spacer/>
             
              <v-btn size="small" variant="tonal" class="mr-1" color="white" :to="`/key/${key.id}`">Manage</v-btn>
              
              <v-menu>
-               <template v-slot:activator="{ props }">
-                 <v-btn v-bind="props" icon="mdi-dots-vertical" variant="text" size="small"></v-btn>
+               <template #activator="{ props }">
+                 <v-btn v-bind="props" icon="mdi-dots-vertical" variant="text" size="small"/>
                </template>
                <v-list class="glass-panel" density="compact">
-                 <v-list-item prepend-icon="mdi-delete" title="Delete Key" base-color="error" @click="confirmDelete(key.id)"></v-list-item>
+                 <v-list-item prepend-icon="mdi-delete" title="Delete Key" base-color="error" @click="confirmDelete(key.id)"/>
                </v-list>
              </v-menu>
           </v-card-actions>
@@ -91,7 +91,7 @@
     
     <v-snackbar v-model="snackbar" :color="snackbarColor" location="bottom right">
       {{ snackbarText }}
-      <template v-slot:actions>
+      <template #actions>
         <v-btn variant="text" @click="snackbar = false">Close</v-btn>
       </template>
     </v-snackbar>

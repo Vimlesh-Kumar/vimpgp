@@ -2,14 +2,14 @@
   <div class="d-flex align-center justify-center py-10">
     <v-card class="glass-card pa-8 w-100 rounded-xl" max-width="600">
       <div class="d-flex align-center mb-8">
-        <v-btn icon="mdi-arrow-left" variant="tonal" to="/" class="mr-4" color="white"></v-btn>
+        <v-btn icon="mdi-arrow-left" variant="tonal" to="/" class="mr-4" color="white"/>
         <div>
            <h2 class="text-h4 font-weight-bold text-white">Generate Key Pair</h2>
            <div class="text-subtitle-2 text-medium-emphasis">Create a new PGP identity</div>
         </div>
       </div>
 
-      <v-form @submit.prevent="handleGenerate" ref="formRef">
+      <v-form ref="formRef" @submit.prevent="handleGenerate">
         <v-text-field
           v-model="form.name"
           label="Full Name"
@@ -19,7 +19,7 @@
           class="mb-1"
           rounded="lg"
           :rules="[v => !!v || 'Name is required']"
-        ></v-text-field>
+        />
 
         <v-text-field
           v-model="form.email"
@@ -30,7 +30,7 @@
           class="mb-1"
            rounded="lg"
           :rules="[v => !!v || 'Email is required', v => /.+@.+\..+/.test(v) || 'Invalid email']"
-        ></v-text-field>
+        />
 
         <v-text-field
           v-model="form.passphrase"
@@ -38,19 +38,19 @@
           placeholder="Protect your private key"
           prepend-inner-icon="mdi-lock"
           :append-inner-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
-          @click:append-inner="showPass = !showPass"
           :type="showPass ? 'text' : 'password'"
           variant="solo-filled"
           class="mb-4"
-           rounded="lg"
-          hint="Leave empty for no passphrase (not recommended)"
+          rounded="lg"
+           hint="Leave empty for no passphrase (not recommended)"
           persistent-hint
-        ></v-text-field>
+          @click:append-inner="showPass = !showPass"
+        />
         
         <div class="d-flex align-center mb-6">
-           <v-divider class="mr-4"></v-divider>
+           <v-divider class="mr-4"/>
            <span class="text-caption text-uppercase font-weight-bold text-medium-emphasis">Advanced</span>
-           <v-divider class="ml-4"></v-divider>
+           <v-divider class="ml-4"/>
         </div>
 
         <v-select
@@ -62,7 +62,7 @@
           class="mb-4"
           rounded="lg"
           menu-props="{ contentClass: 'glass-panel' }"
-        ></v-select>
+        />
 
         <v-select
           v-if="form.algo === 'ecc'"
@@ -74,7 +74,7 @@
           class="mb-8"
           rounded="lg"
           menu-props="{ contentClass: 'glass-panel' }"
-        ></v-select>
+        />
 
         <v-select
           v-if="form.algo === 'rsa'"
@@ -92,7 +92,7 @@
           class="mb-4"
           rounded="lg"
           menu-props="{ contentClass: 'glass-panel' }"
-        ></v-select>
+        />
 
         <v-select
           v-model="form.expiry"
@@ -113,7 +113,7 @@
           class="mb-8"
           rounded="lg"
           menu-props="{ contentClass: 'glass-panel' }"
-        ></v-select>
+        />
 
         <v-btn
           type="submit"
