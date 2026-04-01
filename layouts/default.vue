@@ -51,6 +51,17 @@
         <v-divider vertical inset class="mx-4 d-none d-sm-block" style="opacity: 0.1"/>
 
         <v-btn
+          icon
+          variant="tonal"
+          size="40"
+          class="glass-panel-btn border-1 mr-3"
+          :title="`Theme: ${themeLabel}`"
+          @click="toggleTheme"
+        >
+          <v-icon size="20">{{ themeIcon }}</v-icon>
+        </v-btn>
+
+        <v-btn
            icon
            variant="tonal"
            size="40"
@@ -84,8 +95,65 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onBeforeUnmount, onMounted, computed, watch } from 'vue'
+import { useTheme } from 'vuetify'
 const activeTab = ref(null)
+const theme = useTheme()
+const themeMode = ref('dark')
+const systemDark = ref(false)
+let mediaQuery = null
+let mediaHandler = null
+
+const themeIcon = computed(() => {
+  if (themeMode.value === 'system') return 'mdi-laptop'
+  return themeMode.value === 'dark' ? 'mdi-weather-night' : 'mdi-white-balance-sunny'
+})
+
+const themeLabel = computed(() => {
+  if (themeMode.value === 'system') return 'System'
+  return themeMode.value === 'dark' ? 'Dark' : 'Light'
+})
+
+const applyTheme = () => {
+  const resolved = themeMode.value === 'system'
+    ? (systemDark.value ? 'dark' : 'light')
+    : themeMode.value
+  theme.global.name.value = resolved
+}
+
+const toggleTheme = () => {
+  themeMode.value = themeMode.value === 'dark' ? 'light' : 'dark'
+}
+
+onMounted(() => {
+  if (!import.meta.client) return
+  const stored = localStorage.getItem('vimpgp_theme')
+  if (stored === 'light' || stored === 'dark' || stored === 'system') {
+    themeMode.value = stored
+  }
+  mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+  systemDark.value = mediaQuery.matches
+
+  mediaHandler = (event) => {
+    systemDark.value = event.matches
+    if (themeMode.value === 'system') applyTheme()
+  }
+
+  if (mediaQuery.addEventListener) mediaQuery.addEventListener('change', mediaHandler)
+  else mediaQuery.addListener(mediaHandler)
+
+  watch(themeMode, (mode) => {
+    if (!import.meta.client) return
+    localStorage.setItem('vimpgp_theme', mode)
+    applyTheme()
+  }, { immediate: true })
+})
+
+onBeforeUnmount(() => {
+  if (!mediaQuery || !mediaHandler) return
+  if (mediaQuery.removeEventListener) mediaQuery.removeEventListener('change', mediaHandler)
+  else mediaQuery.removeListener(mediaHandler)
+})
 </script>
 
 <style scoped>

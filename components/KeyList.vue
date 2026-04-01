@@ -88,7 +88,7 @@
                  <template #activator="{ props }">
                    <v-btn v-bind="props" icon="mdi-dots-vertical" variant="tonal" size="small" class="rounded-lg action-btn-hover"/>
                  </template>
-                 <v-list class="glass-panel" density="compact" min-width="150" theme="dark">
+                 <v-list class="glass-panel" density="compact" min-width="150">
                    <v-list-item prepend-icon="mdi-delete-outline" title="Destroy Key" base-color="error" class="font-weight-bold" @click="confirmDelete(key.id)"/>
                  </v-list>
                </v-menu>

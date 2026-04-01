@@ -3,11 +3,35 @@ import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 
 export default defineNuxtPlugin((app) => {
+    const getInitialTheme = () => {
+        if (!import.meta.client) return 'dark';
+        const stored = localStorage.getItem('vimpgp_theme');
+        const mode = stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'dark';
+        if (mode === 'system') {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        return mode;
+    };
+
     const vuetify = createVuetify({
         ssr: true,
         theme: {
-            defaultTheme: 'dark',
+            defaultTheme: getInitialTheme(),
             themes: {
+                light: {
+                    dark: false,
+                    colors: {
+                        primary: '#0077FF',
+                        secondary: '#FF4081',
+                        accent: '#6C63FF',
+                        error: '#D32F2F',
+                        info: '#1976D2',
+                        success: '#2E7D32',
+                        warning: '#F9A825',
+                        background: '#F4F6FB',
+                        surface: '#FFFFFF',
+                    },
+                },
                 dark: {
                     dark: true,
                     colors: {
