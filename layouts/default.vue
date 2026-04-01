@@ -220,14 +220,14 @@ onBeforeUnmount(() => {
 
 .blob {
   position: absolute;
-  filter: blur(80px);
-  opacity: 0.4;
+  filter: blur(120px);
+  opacity: 0.15;
   border-radius: 50%;
   animation: float 20s infinite ease-in-out;
 }
 
 .blob-1 {
-  background: #6200ea;
+  background: #B338FF;
   width: 400px;
   height: 400px;
   top: -100px;
@@ -236,7 +236,7 @@ onBeforeUnmount(() => {
 }
 
 .blob-2 {
-  background: #00e5ff;
+  background: #00FFCC;
   width: 300px;
   height: 300px;
   bottom: 0;
@@ -245,7 +245,7 @@ onBeforeUnmount(() => {
 }
 
 .blob-3 {
-  background: #ff4081;
+  background: #FF007F;
   width: 250px;
   height: 250px;
   top: 40%;

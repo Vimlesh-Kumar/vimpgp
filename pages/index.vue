@@ -17,28 +17,30 @@
 
           <v-divider class="mb-6" style="opacity: 0.1"/>
 
-          <div class="mb-8">
-            <div class="d-flex align-center justify-space-between mb-3 text-caption">
+          <div class="glass-card pa-6 rounded-xl border-primary mb-8 position-relative overflow-hidden glow-box">
+            <div class="d-flex align-center justify-space-between mb-4 text-caption">
               <span class="text-disabled font-weight-bold uppercase tracking-widest">Privacy</span>
-              <span class="text-success font-weight-black">100% SECURE</span>
+              <v-chip size="small" color="success" variant="tonal" class="font-weight-black px-3"><v-icon start size="14">mdi-lock-check</v-icon>100% SECURE</v-chip>
             </div>
-            <div class="d-flex align-center justify-space-between mb-3 text-caption">
+            <div class="d-flex align-center justify-space-between mb-4 text-caption">
               <span class="text-disabled font-weight-bold uppercase tracking-widest">Performance</span>
-              <span class="text-white font-weight-black">ZERO LATENCY</span>
+              <v-chip size="small" color="info" variant="tonal" class="font-weight-black px-3"><v-icon start size="14">mdi-lightning-bolt</v-icon>ZERO LATENCY</v-chip>
             </div>
             <div class="d-flex align-center justify-space-between text-caption">
               <span class="text-disabled font-weight-bold uppercase tracking-widest">Engine</span>
-              <span class="text-white font-weight-black">OPENPGP.JS</span>
+              <v-chip size="small" color="primary" variant="tonal" class="font-weight-black px-3"><v-icon start size="14">mdi-cog-outline</v-icon>OPENPGP.JS</v-chip>
             </div>
           </div>
 
-          <v-btn block color="primary" size="large" to="/generate" prepend-icon="mdi-plus" class="font-weight-black rounded-xl mb-4 shadow-glow">
-            Generate Key
+          <v-btn block color="primary" size="x-large" to="/generate" prepend-icon="mdi-creation" class="font-weight-black rounded-xl mb-4 shadow-glow text-h6" height="64" variant="elevated">
+            Create Key Pair
           </v-btn>
 
-          <div class="glass-card pa-4 rounded-xl text-caption border-primary mb-6">
-            <v-icon size="16" color="primary" class="mr-1">mdi-shield-check</v-icon>
-            Your keys never leave your physical device. No servers. No tracking.
+          <div class="glass-card pa-4 rounded-xl text-caption border-1 bg-black-alpha-20 d-flex align-start gap-3">
+            <v-icon size="24" color="secondary" class="mt-1">mdi-shield-check</v-icon>
+            <div class="line-height-tight text-disabled">
+              <span class="text-white font-weight-bold">Zero-knowledge architecture.</span> Your keys never leave your physical device. No servers. No tracking.
+            </div>
           </div>
         </div>
       </v-col>
@@ -83,6 +85,22 @@ useHead({
   right: 20px;
   z-index: 2;
   animation: float 6s infinite ease-in-out -3s;
+}
+
+.glow-box {
+  box-shadow: 0 0 30px rgba(var(--v-theme-primary), 0.05) inset;
+}
+
+.bg-black-alpha-20 {
+  background-color: rgba(0,0,0,0.2) !important;
+}
+
+.gap-3 {
+  gap: 12px;
+}
+
+.line-height-tight {
+  line-height: 1.4;
 }
 
 .hover-border-primary {

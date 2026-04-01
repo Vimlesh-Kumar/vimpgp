@@ -21,11 +21,11 @@ body {
 
 /* Theme-aware glass variables */
 .v-theme--dark {
-  --glass-bg: rgba(30, 30, 30, 0.4);
-  --glass-bg-strong: rgba(30, 30, 30, 0.95);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  --glass-shadow-soft: 0 4px 20px 0 rgba(0, 0, 0, 0.25);
+  --glass-bg: rgba(15, 15, 15, 0.4);
+  --glass-bg-strong: rgba(10, 10, 10, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+  --glass-shadow-soft: 0 4px 20px 0 rgba(0, 0, 0, 0.4);
 }
 
 .v-theme--light {
@@ -79,7 +79,7 @@ body {
 
 /* Gradient Text */
 .text-gradient {
-  background: linear-gradient(135deg, #00E5FF 0%, #FF4081 100%);
+  background: linear-gradient(135deg, #00FFCC 0%, #B338FF 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

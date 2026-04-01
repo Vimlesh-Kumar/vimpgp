@@ -5,15 +5,15 @@
        <!-- <v-divider class="ml-4" style="opacity: 0.1"/> -->
     </div>
     
-    <div v-if="keys.length === 0" class="text-center py-16 glass-card rounded-xl border-dashed">
-       <v-avatar color="surface" size="80" class="mb-4 elevation-4">
-         <v-icon icon="mdi-shield-key-outline" size="40" color="primary"/>
+    <div v-if="keys.length === 0" class="text-center py-16 glass-card rounded-xl border-dashed position-relative overflow-hidden premium-card">
+       <v-avatar color="primary" variant="tonal" size="100" class="mb-6 elevation-8 shadow-glow pulse-avatar">
+         <v-icon icon="mdi-shield-key-outline" size="50" color="primary"/>
        </v-avatar>
-       <div class="text-h5 font-weight-bold mb-2">No keys found</div>
-       <div class="text-body-1 text-medium-emphasis mb-8" style="max-width: 400px; margin: 0 auto;">
-         Your local browser storage is empty. Create a new PGP key pair to securely encrypt and sign your messages.
+       <div class="text-h4 font-weight-black mb-3 text-gradient">No keys found</div>
+       <div class="text-body-1 text-medium-emphasis mb-8 line-height-relaxed" style="max-width: 400px; margin: 0 auto;">
+         Your secure keyring is currently empty. Generate a new cryptographic key pair to start encrypting and signing your messages.
        </div>
-       <v-btn color="primary" size="large" to="/generate" prepend-icon="mdi-creation" elevation="8">Generate Key Pair</v-btn>
+       <v-btn color="primary" size="x-large" to="/generate" prepend-icon="mdi-creation" elevation="8" class="font-weight-black rounded-lg px-8">Generate Key Pair</v-btn>
     </div>
 
     <v-row v-else class="g-6 align-stretch">
@@ -147,6 +147,15 @@ const confirmDelete = (id: string) => {
 .border-dashed {
   border-style: dashed !important;
   border-width: 2px !important;
+  border-color: rgba(var(--v-theme-primary), 0.2) !important;
+}
+.pulse-avatar {
+  animation: pulse-glow 3s infinite ease-in-out;
+}
+@keyframes pulse-glow {
+  0% { box-shadow: 0 0 0 0 rgba(var(--v-theme-primary), 0.4); }
+  70% { box-shadow: 0 0 0 15px rgba(var(--v-theme-primary), 0); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--v-theme-primary), 0); }
 }
 .premium-card {
   border: 1px solid rgba(255, 255, 255, 0.05) !important;
