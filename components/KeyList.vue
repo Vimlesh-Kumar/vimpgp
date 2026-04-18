@@ -17,7 +17,7 @@
     </div>
     
     <div v-if="keys.length === 0" class="text-center py-16 glass-card rounded-xl border-dashed position-relative overflow-hidden premium-card">
-       <div class="bg-glow"></div>
+       <div class="bg-glow"/>
        <v-avatar color="primary" variant="tonal" size="100" class="mb-6 elevation-8 shadow-glow pulse-avatar">
          <v-icon icon="mdi-shield-key-outline" size="50" color="primary"/>
        </v-avatar>
@@ -42,7 +42,7 @@
                     <v-avatar color="primary" variant="tonal" size="64" class="rounded-xl border-primary shadow-glow">
                       <span class="text-h4 font-weight-black">{{ key.name.charAt(0).toUpperCase() }}</span>
                     </v-avatar>
-                    <v-badge dot color="success" offset-x="5" offset-y="5" class="status-badge-mini"></v-badge>
+                    <v-badge dot color="success" offset-x="5" offset-y="5" class="status-badge-mini"/>
                  </div>
                  <div class="overflow-hidden">
                    <div class="text-h6 font-weight-black text-white mb-0 line-height-tight text-truncate" style="max-width: 250px;">{{ key.name }}</div>
@@ -169,8 +169,9 @@ const handleImport = async () => {
     snackbar.value = true
     importDialog.value = false
     importArmoredKey.value = ''
-  } catch (e: any) {
-    snackbarText.value = 'Failed to import: ' + e.message
+  } catch (e: unknown) {
+    const error = e as Error
+    snackbarText.value = 'Failed to import: ' + error.message
     snackbarColor.value = 'error'
     snackbar.value = true
   } finally {

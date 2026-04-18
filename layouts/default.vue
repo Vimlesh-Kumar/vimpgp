@@ -21,7 +21,7 @@
 
       <div class="d-none d-lg-flex align-center">
         <v-chip size="small" variant="tonal" color="success" class="font-weight-black px-4 status-badge shadow-success">
-          <div class="status-dot mr-2"></div>
+          <div class="status-dot mr-2"/>
           CLIENT-SIDE SECURE
         </v-chip>
       </div>

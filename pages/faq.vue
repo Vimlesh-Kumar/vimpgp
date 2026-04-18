@@ -18,7 +18,7 @@
               {{ item.q }}
             </v-expansion-panel-title>
             <v-expansion-panel-text class="text-body-1 text-medium-emphasis py-4 px-2 line-height-relaxed">
-              <div v-html="item.a"></div>
+              <div v-html="item.a"/>
             </v-expansion-panel-text>
           </v-expansion-panel>
         </v-expansion-panels>

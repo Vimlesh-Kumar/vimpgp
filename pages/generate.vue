@@ -64,7 +64,7 @@
               <v-expansion-panels flat class="advanced-panels">
                 <v-expansion-panel class="bg-transparent">
                   <v-expansion-panel-title class="px-0 py-2">
-                    <template v-slot:default>
+                    <template #default>
                       <div class="d-flex align-center">
                         <v-icon color="primary" class="mr-2">mdi-cog-outline</v-icon>
                         <span class="text-caption text-uppercase font-weight-bold text-medium-emphasis tracking-widest">Advanced Security Parameters</span>

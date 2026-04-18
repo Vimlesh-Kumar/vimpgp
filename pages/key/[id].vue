@@ -5,7 +5,7 @@
     </div>
 
     <v-card class="glass-card pa-8 mb-8 rounded-xl border-primary shadow-glow overflow-hidden position-relative">
-       <div class="bg-glow"></div>
+       <div class="bg-glow"/>
        <div class="d-flex flex-column flex-md-row justify-space-between align-start gap-6 position-relative" style="z-index: 1;">
          <div class="d-flex align-center">
             <v-avatar color="primary" variant="tonal" size="80" class="mr-6 rounded-xl border-primary shadow-glow">

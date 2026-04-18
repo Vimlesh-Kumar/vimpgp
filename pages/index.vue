@@ -10,14 +10,14 @@
           <p class="text-body-2 text-medium-emphasis mb-6 line-height-relaxed">
             VimPGP is a premium, <strong>Open Source</strong>, client-side PGP toolset. 
             All cryptographic operations happen in your browser. 
-            <br/><br/>
+            <br><br>
             <strong>No data ever leaves your device.</strong> No accounts, no cookies, no tracking. Just pure privacy.
           </p>
 
           <v-divider class="mb-6" style="opacity: 0.1"/>
 
           <div class="glass-card pa-6 rounded-xl border-primary mb-8 position-relative overflow-hidden glow-box">
-             <div class="bg-glow"></div>
+             <div class="bg-glow"/>
              <div class="d-flex align-center justify-space-between mb-4 text-caption">
                <span class="text-disabled font-weight-bold uppercase tracking-widest">Security</span>
                <v-chip size="small" color="success" variant="tonal" class="font-weight-black px-3">ED25519 / RSA</v-chip>

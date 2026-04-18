@@ -10,8 +10,17 @@ export interface PgpKeyRecord {
     revocationCertificate: string;
     createdAt: string;
     type: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    subkeys?: any[];
+    subkeys?: {
+        id: string;
+        fingerprint: string;
+        created: string;
+        algo: string;
+        bits: number;
+        curve: string;
+        isPrimary: boolean;
+        type: string;
+        expiry: string | null;
+    }[];
 }
 
 export const usePgp = () => {
@@ -118,7 +127,6 @@ export const usePgp = () => {
 
     const getKeyDetails = async (armoredKey: string) => {
         const key = await openpgp.readKey({ armoredKey });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const allKeys: any[] = [];
 
         // Primary
@@ -243,11 +251,12 @@ export const usePgp = () => {
             const signature = await openpgp.readSignature({ armoredSignature: signatureArmored });
             const msg = await openpgp.createMessage({ text: message });
 
-            const verificationResult = await openpgp.verify({
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const verificationResult: any = await openpgp.verify({
                 message: msg,
                 signature,
                 verificationKeys: publicKey
-            }) as any;
+            });
 
             if (!verificationResult.signatures || verificationResult.signatures.length === 0) {
                 return false;
@@ -296,8 +305,9 @@ export const usePgp = () => {
             keys.value.push(newKey);
             saveKeys();
             return newKey;
-        } catch (e) {
-            console.error('Failed to import key', e);
+        } catch (e: unknown) {
+            const error = e as Error;
+            console.error('Failed to import key', error);
             throw e;
         }
     }

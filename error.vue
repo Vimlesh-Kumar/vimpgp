@@ -7,7 +7,7 @@
       </div>
       
       <v-card class="glass-card pa-12 rounded-xl text-center border-1 overflow-hidden premium-card" max-width="600" style="z-index: 1;">
-         <div class="bg-glow"></div>
+         <div class="bg-glow"/>
          <v-avatar color="error" variant="tonal" size="100" class="mb-8 elevation-10 shadow-error">
            <v-icon size="60">mdi-alert-circle-outline</v-icon>
          </v-avatar>
@@ -16,7 +16,7 @@
          <p class="text-body-1 text-medium-emphasis mb-10 line-height-relaxed">
            The cryptographic path you're looking for doesn't exist or has been securely erased. Let's get you back to safety.
          </p>
-         <v-btn color="primary" size="x-large" to="/" prepend-icon="mdi-home" class="font-weight-black rounded-lg px-8 shadow-glow">
+         <v-btn color="primary" size="x-large" prepend-icon="mdi-home" class="font-weight-black rounded-lg px-8 shadow-glow" @click="handleError">
            Back to Dashboard
          </v-btn>
       </v-card>
@@ -25,11 +25,15 @@
 </template>
 
 <script setup>
-defineProps({
-  error: Object
+const props = defineProps({
+  error: {
+    type: Object,
+    default: () => ({ message: 'An unknown error occurred' })
+  }
 })
 
 const handleError = () => clearError({ redirect: '/' })
+// Use handleError in the template or just suppress if it's meant for the component logic
 
 useHead({
   title: '404 - Not Found | VimPGP'
