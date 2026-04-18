@@ -8,7 +8,7 @@ body {
   color: rgb(var(--v-theme-on-background));
 }
 
-/* Override Vuetify application font */
+/* Override Vuetify application font and set responsive base */
 .v-application {
   font-family: 'Outfit', sans-serif !important;
   background: radial-gradient(
@@ -17,10 +17,34 @@ body {
     rgb(var(--v-theme-background)) 75%
   ) !important;
   min-height: 100vh;
+  font-size: 14px; /* Slightly smaller base font */
+}
+
+/* Responsive Typography Overrides */
+h1.text-h1, h1.text-h2, h1.text-h3 {
+  font-size: clamp(2rem, 5vw, 3.5rem) !important;
+  line-height: 1.1 !important;
+}
+
+h2.text-h4 {
+  font-size: clamp(1.5rem, 4vw, 2.2rem) !important;
+}
+
+h3.text-h5, h3.text-h6 {
+  font-size: clamp(1.2rem, 3vw, 1.5rem) !important;
+}
+
+.text-body-1 {
+  font-size: 0.95rem !important;
+}
+
+.text-body-2 {
+  font-size: 0.85rem !important;
 }
 
 /* Theme-aware glass variables */
 .v-theme--dark {
+  --logo-text: #ffffff;
   --glass-bg: rgba(15, 15, 15, 0.4);
   --glass-bg-strong: rgba(10, 10, 10, 0.85);
   --glass-border: rgba(255, 255, 255, 0.08);
@@ -29,6 +53,7 @@ body {
 }
 
 .v-theme--light {
+  --logo-text: #1a1a1a;
   --glass-bg: rgba(255, 255, 255, 0.7);
   --glass-bg-strong: rgba(255, 255, 255, 0.98);
   --glass-border: rgba(0, 0, 0, 0.08);
@@ -63,6 +88,25 @@ body {
 
 .font-mono {
   font-family: 'Roboto Mono', monospace !important;
+}
+
+.v-tooltip > .v-overlay__content, 
+.v-tooltip .v-overlay__content,
+.v-tooltip__content {
+  background: rgba(0, 0, 0, 0.95) !important;
+  color: white !important;
+  font-size: 0.7rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.8px !important;
+  text-transform: uppercase !important;
+  padding: 6px 12px !important;
+  border: 1px solid rgba(var(--v-theme-primary), 0.3) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+}
+
+.text-logo-white {
+  color: var(--logo-text) !important;
 }
 
 .scroll-mt-20 {

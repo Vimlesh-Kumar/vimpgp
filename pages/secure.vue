@@ -5,7 +5,7 @@
         <div class="d-flex align-center mb-8">
           <v-btn icon="mdi-arrow-left" variant="tonal" to="/" class="mr-4 glass-panel-btn" color="primary"/>
           <div>
-            <h1 class="text-h3 font-weight-black text-white tracking-tighter shadow-text">
+            <h1 class="text-h3 font-weight-black text-logo-white tracking-tighter shadow-text">
               Secure <span class="text-gradient">Messaging</span>
             </h1>
             <div class="text-caption text-disabled uppercase font-weight-bold tracking-widest">Encrypt, Decrypt, Sign & Verify</div>
@@ -307,7 +307,7 @@
                   variant="tonal"
                   class="rounded-xl border-1 py-8"
                 >
-                  <div class="text-h4 font-weight-black mb-2">
+                  <div class="text-h4 font-weight-black mb-2 text-logo-white">
                     {{ verifyResult ? 'SIGNATURE VALID' : 'SIGNATURE INVALID' }}
                   </div>
                   <div class="text-body-1">

@@ -1,46 +1,46 @@
 <template>
   <div>
-    <div class="d-flex align-center justify-space-between mb-6">
-       <h2 class="text-h5 font-weight-black uppercase tracking-widest text-primary d-flex align-center">
-         <v-icon color="primary" class="mr-2">mdi-key-chain-variant</v-icon>
+    <div class="d-flex align-center justify-space-between mb-4">
+       <h2 class="text-h6 font-weight-black uppercase tracking-widest text-primary d-flex align-center">
+         <v-icon color="primary" class="mr-2" size="20">mdi-key-chain-variant</v-icon>
          Your Keyring
        </h2>
        
        <div class="d-flex gap-2">
-         <v-btn variant="tonal" color="secondary" prepend-icon="mdi-import" class="rounded-lg font-weight-bold" @click="importDialog = true">
-           Import Key
+         <v-btn variant="tonal" size="small" color="secondary" prepend-icon="mdi-import" class="rounded-lg font-weight-bold" @click="importDialog = true">
+           Import
          </v-btn>
-         <v-btn color="primary" prepend-icon="mdi-plus" to="/generate" class="rounded-lg font-weight-bold shadow-glow">
+         <v-btn color="primary" size="small" prepend-icon="mdi-plus" to="/generate" class="rounded-lg font-weight-bold shadow-glow">
            New Pair
          </v-btn>
        </div>
     </div>
     
-    <div v-if="keys.length === 0" class="text-center py-16 glass-card rounded-xl border-dashed position-relative overflow-hidden premium-card">
+    <div v-if="keys.length === 0" class="text-center py-12 glass-card rounded-xl border-dashed position-relative overflow-hidden premium-card">
        <div class="bg-glow"/>
-       <v-avatar color="primary" variant="tonal" size="100" class="mb-6 elevation-8 shadow-glow pulse-avatar">
-         <v-icon icon="mdi-shield-key-outline" size="50" color="primary"/>
+       <v-avatar color="primary" variant="tonal" size="80" class="mb-5 elevation-8 shadow-glow pulse-avatar">
+         <v-icon icon="mdi-shield-key-outline" size="40" color="primary"/>
        </v-avatar>
-       <div class="text-h4 font-weight-black mb-3 text-gradient">Secure Keyring Empty</div>
-       <div class="text-body-1 text-medium-emphasis mb-8 line-height-relaxed" style="max-width: 450px; margin: 0 auto;">
+       <div class="text-h5 font-weight-black mb-2 text-gradient">Secure Keyring Empty</div>
+       <div class="text-body-2 text-medium-emphasis mb-6 line-height-relaxed" style="max-width: 400px; margin: 0 auto;">
          Your local cryptographic vault is ready. Create your first identity or import an existing PGP key to start secure communication.
        </div>
-       <div class="d-flex justify-center gap-4">
-         <v-btn color="primary" size="x-large" to="/generate" prepend-icon="mdi-creation" elevation="8" class="font-weight-black rounded-lg px-8">Generate Key Pair</v-btn>
-         <v-btn color="secondary" variant="tonal" size="x-large" prepend-icon="mdi-import" class="font-weight-black rounded-lg px-8" @click="importDialog = true">Import Key</v-btn>
+       <div class="d-flex justify-center gap-3">
+         <v-btn color="primary" size="large" to="/generate" prepend-icon="mdi-creation" elevation="8" class="font-weight-black rounded-lg px-6">Generate</v-btn>
+         <v-btn color="secondary" variant="tonal" size="large" prepend-icon="mdi-import" class="font-weight-black rounded-lg px-6" @click="importDialog = true">Import</v-btn>
        </div>
     </div>
 
     <v-row v-else class="g-6 align-stretch">
-      <v-col v-for="key in keys" :key="key.id" cols="12" xl="6" class="d-flex">
+      <v-col v-for="key in keys" :key="key.id" cols="12" lg="6" class="d-flex">
         <v-card class="glass-card pa-0 w-100 d-flex flex-column transition-swing premium-card" hover>
           <!-- Card Header & Identity -->
-          <div class="pa-5 pr-4">
+          <div class="pa-4 pr-3">
             <div class="d-flex align-start justify-space-between">
                <div class="d-flex align-center overflow-hidden">
-                 <div class="avatar-wrapper mr-4">
-                    <v-avatar color="primary" variant="tonal" size="64" class="rounded-xl border-primary shadow-glow">
-                      <span class="text-h4 font-weight-black">{{ key.name.charAt(0).toUpperCase() }}</span>
+                 <div class="avatar-wrapper mr-3">
+                    <v-avatar color="primary" variant="tonal" size="48" class="rounded-lg border-primary shadow-glow">
+                      <span class="text-h6 font-weight-black">{{ key.name.charAt(0).toUpperCase() }}</span>
                     </v-avatar>
                     <v-badge dot color="success" offset-x="5" offset-y="5" class="status-badge-mini"/>
                  </div>
@@ -257,7 +257,11 @@ const confirmDelete = (id: string) => {
 }
 .action-btn-hover:hover {
   transform: translateY(-2px);
-  filter: brightness(1.2);
-  background-color: rgba(255, 255, 255, 0.1) !important;
+  filter: brightness(1.5);
+  background-color: rgba(var(--v-theme-primary), 0.15) !important;
+}
+
+.action-btn-hover:hover .v-icon {
+  color: inherit !important;
 }
 </style>

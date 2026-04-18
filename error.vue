@@ -11,7 +11,7 @@
          <v-avatar color="error" variant="tonal" size="100" class="mb-8 elevation-10 shadow-error">
            <v-icon size="60">mdi-alert-circle-outline</v-icon>
          </v-avatar>
-         <h1 class="text-h1 font-weight-black text-white mb-2" style="font-size: 8rem !important; letter-spacing: -5px !important;">404</h1>
+         <h1 class="text-h1 font-weight-black text-logo-white mb-2" style="font-size: 8rem !important; letter-spacing: -5px !important;">404</h1>
          <h2 class="text-h4 font-weight-black text-gradient mb-4">Identity Not Found</h2>
          <p class="text-body-1 text-medium-emphasis mb-10 line-height-relaxed">
            The cryptographic path you're looking for doesn't exist or has been securely erased. Let's get you back to safety.

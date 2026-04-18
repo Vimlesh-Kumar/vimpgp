@@ -1,37 +1,34 @@
 <template>
-  <div class="py-10">
+  <div class="py-2 py-sm-8">
     <v-row justify="center">
       <v-col cols="12" md="10" lg="8">
-        <div class="text-center mb-12">
-          <v-avatar color="primary" variant="tonal" size="80" class="mb-4 shadow-glow border-primary">
-            <v-icon icon="mdi-help-circle" size="40"/>
+        <div class="text-center mb-10">
+          <v-avatar color="primary" variant="tonal" size="56" class="mb-4 border-1">
+            <v-icon icon="mdi-help-circle-outline" size="28"/>
           </v-avatar>
-          <h1 class="text-h2 font-weight-black text-white tracking-tighter mb-4">Common <span class="text-gradient">Questions</span></h1>
-          <p class="text-h6 text-medium-emphasis mx-auto" style="max-width: 700px;">
-            Everything you need to know about PGP, security, and VimPGP.
+          <h1 class="text-h3 font-weight-black text-white tracking-tighter mb-3">Security <span class="text-gradient">Insights</span></h1>
+          <p class="text-body-1 text-medium-emphasis mx-auto" style="max-width: 600px;">
+            Understand how VimPGP protects your digital sovereignty.
           </p>
         </div>
 
-        <v-expansion-panels class="faq-panels mb-16">
-          <v-expansion-panel v-for="(item, i) in faqs" :key="i" class="glass-panel mb-4 rounded-lg overflow-hidden">
-            <v-expansion-panel-title class="text-h6 font-weight-bold py-5">
+        <v-expansion-panels class="faq-panels mb-12">
+          <v-expansion-panel v-for="(item, i) in faqs" :key="i" class="glass-panel mb-3 rounded-lg overflow-hidden border-1">
+            <v-expansion-panel-title class="text-body-1 font-weight-bold py-4">
               {{ item.q }}
             </v-expansion-panel-title>
-            <v-expansion-panel-text class="text-body-1 text-medium-emphasis py-4 px-2 line-height-relaxed">
+            <v-expansion-panel-text class="text-body-2 text-disabled py-3 px-1 line-height-relaxed">
               <div v-html="item.a"/>
             </v-expansion-panel-text>
           </v-expansion-panel>
         </v-expansion-panels>
 
-        <v-card class="glass-card pa-8 rounded-xl text-center border-dashed">
-          <h3 class="text-h5 font-weight-bold mb-4">Still have questions?</h3>
-          <p class="text-body-1 text-medium-emphasis mb-6">
-            Check our documentation on GitHub or join the discussion.
-          </p>
-          <v-btn color="primary" variant="flat" size="large" rounded="lg" prepend-icon="mdi-github" href="https://github.com/Vimlesh-Kumar/vimpgp" target="_blank">
-            Technical Docs
-          </v-btn>
-        </v-card>
+        <div class="text-center pt-8 border-t-1">
+           <h3 class="text-h6 font-weight-bold mb-4">Deep Dive into the Source?</h3>
+           <v-btn color="primary" variant="tonal" size="large" rounded="lg" prepend-icon="mdi-github" href="https://github.com/Vimlesh-Kumar/vimpgp" target="_blank" class="px-8 font-weight-black">
+             Technical Documentation
+           </v-btn>
+        </div>
       </v-col>
     </v-row>
   </div>

@@ -1,22 +1,16 @@
 <template>
   <v-app class="app-container">
-    <v-app-bar flat class="glass-effect header-border" height="75">
-      <template #prepend>
-        <NuxtLink to="/" class="text-decoration-none d-flex align-center ml-4 cursor-pointer hover-scale">
-          <v-avatar size="44" class="mr-3 rounded-lg border-primary shadow-glow overflow-hidden">
+    <v-app-bar flat class="glass-navbar border-b-1" height="64">
+      <v-container class="d-flex align-center py-0 px-2 px-sm-4" fluid>
+        <NuxtLink to="/" class="text-decoration-none d-flex align-center">
+          <v-avatar size="36" class="mr-2 mr-sm-3 shadow-glow" rounded="lg">
             <v-img src="/logo.png" cover alt="VimPGP Logo"/>
           </v-avatar>
-          <div class="d-none d-md-block">
-            <div class="text-h5 font-weight-black tracking-tighter d-flex align-center">
-              <span class="text-white">VIM</span><span class="text-gradient">PGP</span>
-            </div>
-            <div class="text-caption text-disabled font-weight-bold mt-n1 uppercase tracking-widest">
-              Secure Keyring
-            </div>
+          <div class="d-none d-sm-flex flex-column justify-center mt-n1">
+            <span class="text-h6 font-weight-black text-logo-white tracking-tighter line-height-tight">VIM<span class="text-gradient">PGP</span></span>
+            <span class="text-caption text-primary font-weight-bold uppercase tracking-widest" style="font-size: 0.6rem !important; margin-top: -4px;">Secure Suite</span>
           </div>
         </NuxtLink>
-      </template>
-
       <v-divider vertical inset class="mx-6 d-none d-lg-block" style="opacity: 0.1"/>
 
       <div class="d-none d-lg-flex align-center">
@@ -26,57 +20,52 @@
         </v-chip>
       </div>
 
-      <v-spacer/>
+        <v-spacer/>
 
-      <div class="d-flex align-center mr-4">
+      <div class="d-flex align-center">
         <v-tabs v-model="activeTab" bg-color="transparent" color="primary" density="compact" hide-slider class="nav-tabs d-none d-sm-flex">
-          <v-tab to="/" value="dashboard" rounded="lg" class="px-4 text-none font-weight-bold">
-            <v-icon start size="18" class="mr-2">mdi-view-dashboard</v-icon>
+          <v-tab to="/" value="dashboard" rounded="lg" class="px-3 text-none font-weight-bold">
+            <v-icon start size="16" class="mr-1">mdi-view-dashboard</v-icon>
             Dashboard
           </v-tab>
-          <v-tab to="/generate" value="generate" rounded="lg" class="px-4 text-none font-weight-bold">
-            <v-icon start size="18" class="mr-2">mdi-key-plus</v-icon>
-            Generate
-          </v-tab>
-          <v-tab to="/secure" value="secure" rounded="lg" class="px-4 text-none font-weight-bold">
-            <v-icon start size="18" class="mr-2">mdi-shield-lock</v-icon>
+          <v-tab to="/secure" value="secure" rounded="lg" class="px-3 text-none font-weight-bold">
+            <v-icon start size="16" class="mr-1">mdi-shield-lock</v-icon>
             Secure
           </v-tab>
-          <v-tab to="/about" value="about" rounded="lg" class="px-4 text-none font-weight-bold">
-            <v-icon start size="18" class="mr-2">mdi-information</v-icon>
-            About
+          <v-tab to="/generate" value="generate" rounded="lg" class="px-3 text-none font-weight-bold">
+            <v-icon start size="16" class="mr-1">mdi-key-plus</v-icon>
+            Generate
           </v-tab>
-          <v-tab to="/faq" value="faq" rounded="lg" class="px-4 text-none font-weight-bold">
-            <v-icon start size="18" class="mr-2">mdi-help-circle</v-icon>
-            FAQ
-          </v-tab>
+          <v-tab to="/faq" value="faq" rounded="lg" class="px-3 text-none font-weight-bold">FAQ</v-tab>
+          <v-tab to="/about" value="about" rounded="lg" class="px-3 text-none font-weight-bold">About</v-tab>
         </v-tabs>
 
-        <v-divider vertical inset class="mx-4 d-none d-sm-block" style="opacity: 0.1"/>
+        <v-divider vertical inset class="mx-3 d-none d-sm-block" style="opacity: 0.1"/>
 
         <v-btn
           icon
           variant="tonal"
-          size="40"
-          class="glass-panel-btn border-1 mr-3"
+          size="32"
+          class="glass-panel-btn border-1 mr-2"
           :title="`Theme: ${themeLabel}`"
           @click="toggleTheme"
         >
-          <v-icon size="20">{{ themeIcon }}</v-icon>
+          <v-icon size="16">{{ themeIcon }}</v-icon>
         </v-btn>
 
         <v-btn
            icon
            variant="tonal"
-           size="40"
+           size="32"
            href="https://github.com/Vimlesh-Kumar/vimpgp"
            target="_blank"
            title="View on GitHub"
            class="glass-panel-btn border-1"
         >
-          <v-icon size="22">mdi-github</v-icon>
+          <v-icon size="18">mdi-github</v-icon>
         </v-btn>
       </div>
+    </v-container>
     </v-app-bar>
 
     <v-main>
