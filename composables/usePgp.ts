@@ -127,6 +127,7 @@ export const usePgp = () => {
 
     const getKeyDetails = async (armoredKey: string) => {
         const key = await openpgp.readKey({ armoredKey });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const allKeys: any[] = [];
 
         // Primary

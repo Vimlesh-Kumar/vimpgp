@@ -33,7 +33,8 @@ const props = defineProps({
 })
 
 const handleError = () => clearError({ redirect: '/' })
-// Use handleError in the template or just suppress if it's meant for the component logic
+// Log error for production debugging
+console.info('VimPGP Security Alert - Error State:', props.error.message)
 
 useHead({
   title: '404 - Not Found | VimPGP'
