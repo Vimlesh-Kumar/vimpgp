@@ -18,7 +18,8 @@
               {{ item.q }}
             </v-expansion-panel-title>
             <v-expansion-panel-text class="text-body-2 text-disabled py-3 px-1 line-height-relaxed">
-              <div v-html="item.a"/>
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <div v-html="item.a" />
             </v-expansion-panel-text>
           </v-expansion-panel>
         </v-expansion-panels>

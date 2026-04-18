@@ -6,7 +6,7 @@
         <div class="sticky-top pt-2">
           <div class="mb-6 relative d-flex justify-center">
              <v-img src="/og-image.png" max-width="180" class="rounded-xl elevation-20 shadow-glow hero-branding-img" alt="VimPGP Branding"/>
-             <div class="branding-ring" style="width: 220px; height: 220px;"></div>
+             <div class="branding-ring" style="width: 220px; height: 220px;" />
           </div>
 
           <h1 class="text-h4 font-weight-black mb-2 tracking-tighter shadow-text text-center text-md-left">
@@ -15,14 +15,14 @@
           <p class="text-body-2 text-medium-emphasis mb-5 line-height-relaxed text-center text-md-left">
             Modern, <strong>Open Source</strong>, 100% client-side PGP toolset. 
              All cryptographic operations happen in your browser. 
-            <br/><br/>
+            <br><br>
             <strong>No data ever leaves your device.</strong>
           </p>
 
           <v-divider class="mb-5 d-none d-md-block" style="opacity: 0.1"/>
 
           <div class="glass-card pa-4 rounded-xl border-primary mb-6 position-relative overflow-hidden glow-box d-none d-md-block">
-             <div class="bg-glow"></div>
+             <div class="bg-glow" />
              <div class="d-flex align-center justify-space-between mb-3 text-caption">
                <span class="text-disabled font-weight-bold uppercase tracking-widest" style="font-size: 0.6rem;">Security</span>
                <v-chip size="x-small" color="success" variant="tonal" class="font-weight-black px-2">ED25519 / RSA</v-chip>

@@ -100,8 +100,6 @@
 </template>
 
 <script setup>
-const config = useRuntimeConfig()
-
 useHead({
   title: 'About - VimPGP'
 })
