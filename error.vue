@@ -33,8 +33,6 @@ const props = defineProps({
 })
 
 const handleError = () => clearError({ redirect: '/' })
-// Log error for production debugging
-console.info('VimPGP Security Alert - Error State:', props.error.message)
 
 useHead({
   title: '404 - Not Found | VimPGP'

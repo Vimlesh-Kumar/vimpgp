@@ -1,163 +1,91 @@
 # VimPGP 🔐
 
-A modern, client-side PGP key management application built with Nuxt 3 and Vuetify. Generate, manage, and use PGP keys entirely in your browser - your keys never leave your device!
+VimPGP is a premium, **100% client-side** OpenPGP identity management suite. Built for developers and privacy advocates who demand absolute security with a modern, glassmorphic experience.
 
-![VimPGP](https://img.shields.io/badge/Security-Client--Side-green)
-![Nuxt](https://img.shields.io/badge/Nuxt-4.2.2-00DC82)
-![Vue](https://img.shields.io/badge/Vue-3.5-4FC08D)
+[![Security - Client-Side](https://img.shields.io/badge/Security-Client--Side-00E5FF?style=for-the-badge&logo=shield-lock)](https://github.com/Vimlesh-Kumar/vimpgp)
+[![Nuxt 3](https://img.shields.io/badge/Nuxt-4.2.2-00DC82?style=for-the-badge&logo=nuxtdotjs)](https://nuxt.com/)
+[![License - MIT](https://img.shields.io/badge/License-MIT-white?style=for-the-badge)](./LICENSE)
 
-## ✨ Features
+---
 
-- 🔒 **100% Client-Side Encryption** - All operations happen in your browser
-- 🎨 **Modern UI** - Beautiful glassmorphism design with dark theme
-- 🔑 **Full Key Management** - Generate, import, export, and delete PGP keys
-- 📝 **Multiple Algorithms** - Support for RSA (1024-8192 bits) and ECC (Curve25519, P-256, P-384, P-521)
-- ⏰ **Flexible Expiry** - Set key expiration from 30 days to 10 years, or never
-- 🔐 **Subkey Support** - Add signing, encryption, and authentication subkeys
-- 💾 **Local Storage** - Keys stored securely in browser localStorage
-- 📤 **Export/Import** - Download and backup your keys easily
+## ✨ Why VimPGP?
 
-## 🚀 Quick Start
+Traditional PGP tools are either complex command-line utilities or centralized web services that ask you to trust their servers. **VimPGP** changes that.
 
-### Prerequisites
+- 🛡️ **Zero-Trust**: All cryptographic operations happen in your browser's memory. No keys, passphrases, or plain-text ever touch a server.
+- ⚡ **ECC & RSA Support**: Modern Elliptic Curve Cryptography (Curve25519) and high-bit RSA (up to 8192-bit) supported.
+- 🎨 **Premium UX**: A performance-optimized, glassmorphic interface that makes security feel effortless.
+- 🔌 **Offline Capabilities**: Once loaded, use it in isolation. All logic is local.
+- 📦 **Subkey Management**: Advanced handling for signing, encryption, and authentication identities.
 
-- Node.js 18+ (recommended: Node 24+)
-- npm or yarn
+---
 
-### Installation
+## 🚀 Quick Deployment (Production)
 
+VimPGP is optimized for serverless hosting. Choose your preferred platform:
+
+### ⚡ Option A: Vercel (Recommended)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Vimlesh-Kumar/vimpgp)
+1. Fork the repo.
+2. Connect to Vercel.
+3. Done. All configurations are pre-tuned in `vercel.json`.
+
+### 🌍 Alternative Platforms
+| Platform | Build Command | Output Directory |
+| :--- | :--- | :--- |
+| **Netlify** | `npm run build` | `.output/public` |
+| **Cloudflare Pages** | `npm run build` | `.output/public` |
+
+---
+
+## 🛠️ Internal Development
+
+### 1. Setup
 ```bash
-# Clone the repository
+# Clone and install
 git clone https://github.com/Vimlesh-Kumar/vimpgp.git
 cd vimpgp
-
-# Install dependencies
 npm install
 
-# Run development server
+# Start Dev Server
 npm run dev
 ```
 
-Visit `http://localhost:3000` to see the app!
-
-### Build for Production
-
+### 2. Code Quality (Linting)
+We maintain a strict quality standard. Before pushing, ensure your code is clean:
 ```bash
-# Build the application
-npm run build
-
-# Preview production build
-npm run preview
+npm run lint      # Check for errors
+npm run lint:fix  # Automatically fix formatting
 ```
 
-## 🌐 Deploy to Vercel (Free)
+---
 
-The easiest way to deploy VimPGP is using Vercel:
+## 🔒 Security Architecture
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Vimlesh-Kumar/vimpgp)
+VimPGP leverages the battle-tested [OpenPGP.js](https://openpgpjs.org/) library.
+- **Storage**: Keys are persisted in `localStorage`. They are never synced to any cloud service.
+- **Verification**: Digital signatures can be verified against imported public keys or pasted armored blocks.
+- **Integrity**: We recommend users to backup their private keys externally, as clearing browser Cache/Data will erase your local keyring.
 
-### Manual Deployment Steps:
-
-1. **Install Vercel CLI** (optional)
-   ```bash
-   npm install -g vercel
-   ```
-
-2. **Deploy via Vercel Dashboard**
-   - Go to [vercel.com](https://vercel.com)
-   - Sign in with GitHub
-   - Click "New Project"
-   - Import your `vimpgp` repository
-   - Click "Deploy"
-
-3. **Deploy via CLI**
-   ```bash
-   vercel
-   ```
-
-## 🎯 Alternative Free Hosting Options
-
-### Netlify
-1. Go to [netlify.com](https://netlify.com)
-2. Connect your GitHub repository
-3. Build command: `npm run build`
-4. Publish directory: `.output/public`
-
-### Cloudflare Pages
-1. Go to [pages.cloudflare.com](https://pages.cloudflare.com)
-2. Connect your GitHub repository
-3. Framework preset: Nuxt.js
-4. Build command: `npm run build`
-
-### GitHub Pages (Static)
-```bash
-npm run generate
-# Deploy the .output/public directory
-```
-
-## 🛠️ Technology Stack
-
-- **Framework**: [Nuxt 4](https://nuxt.com/)
-- **UI Library**: [Vuetify 3](https://vuetifyjs.com/)
-- **Cryptography**: [OpenPGP.js](https://openpgpjs.org/)
-- **Icons**: [Material Design Icons](https://materialdesignicons.com/)
-- **Styling**: Custom CSS with Glassmorphism
-- **Linting**: [ESLint](https://eslint.org/) with [Nuxt ESLint Module](https://eslint.nuxt.com/)
-
-## 🛠️ Development & Linting
-
-To ensure code quality and consistency, this project uses ESLint.
-
-- **Check for issues**: `npm run lint`
-- **Fix issues automatically**: `npm run lint:fix`
-
-For more detailed information, see the [Linting Guide](./LINTING.md).
-
-## 📖 Usage
-
-### Generate a New Key Pair
-
-1. Click "Generate Key Pair" or navigate to the Generate page
-2. Enter your name and email
-3. Choose a strong passphrase (optional but recommended)
-4. Select algorithm (ECC recommended for modern security)
-5. Choose key size and expiration
-6. Click "Generate Identity"
-
-### Manage Keys
-
-- **View Keys**: All keys are displayed on the dashboard
-- **Export Keys**: Click "Manage" → Export Public/Private keys
-- **Add Subkeys**: Manage page → Add Subkey
-- **Delete Keys**: Use the menu (⋮) → Delete Key
-
-## 🔒 Security Notes
-
-- All cryptographic operations happen client-side
-- Private keys are stored in browser localStorage
-- **Always backup your private keys!**
-- Use strong passphrases to protect your keys
-- Never share your private key
+---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions that improve security or UI efficiency are welcome.
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## 📝 License
-
-MIT License - feel free to use this project for personal or commercial purposes.
+---
 
 ## 👨‍💻 Author
 
 **Vimlesh Kumar**
+- Portfolio: [vimlesh.dev](https://vimlesh.dev)
 - GitHub: [@Vimlesh-Kumar](https://github.com/Vimlesh-Kumar)
-
-## 🙏 Acknowledgments
-
-- Built with [OpenPGP.js](https://openpgpjs.org/)
-- UI powered by [Vuetify](https://vuetifyjs.com/)
-- Framework: [Nuxt](https://nuxt.com/)
 
 ---
 
-**⚠️ Disclaimer**: This is a client-side application for educational and personal use. Always follow best practices for key management and security.
+**⚠️ Security Disclaimer**: This software is provided "as is" without warranty of any kind. While built with robust cryptographic standards, users are responsible for their own key management and security practices.

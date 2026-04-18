@@ -45,7 +45,7 @@
         </v-row>
 
         <v-card class="glass-card pa-6 pa-sm-10 rounded-xl mb-10 overflow-hidden position-relative">
-          <div class="bg-glow"></div>
+          <div class="bg-glow"/>
           <v-row align="center">
             <v-col cols="12" md="7">
               <h2 class="text-h4 font-weight-bold mb-4">The <span class="text-gradient">Integrity</span> Commitment</h2>
