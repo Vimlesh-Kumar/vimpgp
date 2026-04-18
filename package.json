@@ -1,6 +1,17 @@
 {
   "name": "vimpgp",
-  "version": "1.0.1",
+  "version": "1.0.2",
+  "description": "Premium, open-source, 100% client-side PGP toolset for secure key generation and messaging.",
+  "keywords": [
+    "pgp",
+    "encryption",
+    "security",
+    "privacy",
+    "client-side",
+    "openpgp"
+  ],
+  "author": "Vimlesh Kumar",
+  "license": "MIT",
   "type": "module",
   "private": true,
   "scripts": {

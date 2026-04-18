@@ -19,8 +19,29 @@ export default defineNuxtConfig({
     baseURL: '/',
     buildAssetsDir: 'assets',
     head: {
+      title: 'VimPGP - Secure Client-Side PGP Toolset',
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'description', content: 'Secure, open-source, client-side PGP toolset for key generation, encryption, decryption, and digital signatures. No data ever leaves your device.' },
+        { name: 'author', content: 'Vimlesh Kumar' },
+        { name: 'theme-color', content: '#00E5FF' },
+        // Open Graph / Facebook
+        { property: 'og:type', content: 'website' },
+        { property: 'og:url', content: 'https://vimpgp.com/' },
+        { property: 'og:title', content: 'VimPGP - Secure Client-Side PGP Toolset' },
+        { property: 'og:description', content: 'Military-grade encryption tool that runs entirely in your browser. Generate keys, encrypt messages, and sign documents with zero data tracking.' },
+        { property: 'og:image', content: 'https://vimpgp.com/og-image.png' },
+        // Twitter
+        { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:url', content: 'https://vimpgp.com/' },
+        { name: 'twitter:title', content: 'VimPGP - Secure Client-Side PGP Toolset' },
+        { name: 'twitter:description', content: 'Military-grade encryption tool that runs entirely in your browser. Generate keys, encrypt messages, and sign documents with zero data tracking.' },
+        { name: 'twitter:image', content: 'https://vimpgp.com/og-image.png' }
+      ],
       link: [
-        { rel: 'icon', type: 'image/png', href: '/logo.png' }
+        { rel: 'icon', type: 'image/png', href: '/logo.png' },
+        { rel: 'manifest', href: '/manifest.json' }
       ]
     }
   },
