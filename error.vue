@@ -7,7 +7,7 @@
       </div>
       
       <v-card class="glass-card pa-12 rounded-xl text-center border-1 overflow-hidden premium-card" max-width="600" style="z-index: 1;">
-         <div class="bg-glow"/>
+         <div class="bg-glow" />
          <v-avatar color="error" variant="tonal" size="100" class="mb-8 elevation-10 shadow-error">
            <v-icon size="60">mdi-alert-circle-outline</v-icon>
          </v-avatar>
@@ -25,7 +25,7 @@
 </template>
 
 <script setup>
-const props = defineProps({
+defineProps({
   error: {
     type: Object,
     default: () => ({ message: 'An unknown error occurred' })
