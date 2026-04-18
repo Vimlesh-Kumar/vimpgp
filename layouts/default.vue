@@ -38,6 +38,10 @@
             <v-icon start size="18" class="mr-2">mdi-key-plus</v-icon>
             Generate
           </v-tab>
+          <v-tab to="/secure" value="secure" rounded="lg" class="px-4 text-none font-weight-bold">
+            <v-icon start size="18" class="mr-2">mdi-shield-lock</v-icon>
+            Secure
+          </v-tab>
           <v-tab to="/about" value="about" rounded="lg" class="px-4 text-none font-weight-bold">
             <v-icon start size="18" class="mr-2">mdi-information</v-icon>
             About

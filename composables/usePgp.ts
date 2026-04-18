@@ -175,6 +175,133 @@ export const usePgp = () => {
         return allKeys;
     };
 
+    const encryptMessage = async (message: string, publicKeys: string[]) => {
+        loading.value = true;
+        try {
+            const encryptionKeys = await Promise.all(
+                publicKeys.map(k => openpgp.readKey({ armoredKey: k }))
+            );
+            
+            const encrypted = await openpgp.encrypt({
+                message: await openpgp.createMessage({ text: message }),
+                encryptionKeys
+            });
+            
+            return encrypted;
+        } finally {
+            loading.value = false;
+        }
+    };
+
+    const decryptMessage = async (encryptedMessage: string, privateKeyArmored: string, passphrase?: string) => {
+        loading.value = true;
+        try {
+            const privateKey = await openpgp.decryptKey({
+                privateKey: await openpgp.readPrivateKey({ armoredKey: privateKeyArmored }),
+                passphrase
+            });
+
+            const message = await openpgp.readMessage({
+                armoredMessage: encryptedMessage as string
+            });
+
+            const { data: decrypted } = await openpgp.decrypt({
+                message,
+                decryptionKeys: privateKey
+            });
+
+            return decrypted;
+        } finally {
+            loading.value = false;
+        }
+    };
+
+    const signMessage = async (message: string, privateKeyArmored: string, passphrase?: string) => {
+        loading.value = true;
+        try {
+            const privateKey = await openpgp.decryptKey({
+                privateKey: await openpgp.readPrivateKey({ armoredKey: privateKeyArmored }),
+                passphrase
+            });
+
+            const signature = await openpgp.sign({
+                message: await openpgp.createMessage({ text: message }),
+                signingKeys: privateKey,
+                format: 'armored'
+            });
+
+            return signature;
+        } finally {
+            loading.value = false;
+        }
+    };
+
+    const verifySignature = async (message: string, signatureArmored: string, publicKeyArmored: string) => {
+        loading.value = true;
+        try {
+            const publicKey = await openpgp.readKey({ armoredKey: publicKeyArmored });
+            const signature = await openpgp.readSignature({ armoredSignature: signatureArmored });
+            const msg = await openpgp.createMessage({ text: message });
+
+            const verificationResult = await openpgp.verify({
+                message: msg,
+                signature,
+                verificationKeys: publicKey
+            }) as any;
+
+            if (!verificationResult.signatures || verificationResult.signatures.length === 0) {
+                return false;
+            }
+
+            const { verified } = verificationResult.signatures[0];
+            try {
+                await verified;
+                return true;
+            } catch (e) {
+                console.error('Signature verification failed', e);
+                return false;
+            }
+        } finally {
+            loading.value = false;
+        }
+    };
+
+    const importKey = async (armoredKey: string) => {
+        try {
+            const key = await openpgp.readKey({ armoredKey });
+            const fingerprint = key.getFingerprint();
+            const keyId = key.getKeyID().toHex();
+            
+            // Check if already exists
+            if (keys.value.find(k => k.id === keyId)) {
+                throw new Error("Key already exists in keyring");
+            }
+
+            const user = key.getUserIDs()[0] || { name: 'Unknown', email: 'unknown' };
+            const isPrivate = key.isPrivate();
+
+            const newKey: PgpKeyRecord = {
+                id: keyId,
+                fingerprint,
+                name: typeof user === 'string' ? user : user.name || 'Unknown',
+                email: typeof user === 'string' ? '' : user.email || '',
+                privateKey: isPrivate ? armoredKey : '',
+                publicKey: isPrivate ? key.toPublic().armor() : armoredKey,
+                revocationCertificate: '',
+                createdAt: new Date().toISOString(),
+                type: 'imported',
+                subkeys: []
+            };
+
+            keys.value.push(newKey);
+            saveKeys();
+            return newKey;
+        } catch (e) {
+            console.error('Failed to import key', e);
+            throw e;
+        }
+    }
+
     return {
         keys,
         loading,
@@ -182,6 +309,11 @@ export const usePgp = () => {
         generate,
         deleteKey,
         getKeyDetails,
-        generateSubkey
+        generateSubkey,
+        encryptMessage,
+        decryptMessage,
+        signMessage,
+        verifySignature,
+        importKey
     };
 };

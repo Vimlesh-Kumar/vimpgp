@@ -1,174 +1,179 @@
 <template>
-  <div v-if="key">
-    <div class="mb-6">
-      <v-btn variant="text" prepend-icon="mdi-arrow-left" to="/">Back to Dashboard</v-btn>
+  <div v-if="key" class="py-6">
+    <div class="mb-8">
+      <v-btn variant="tonal" prepend-icon="mdi-arrow-left" to="/" color="primary" class="rounded-lg font-weight-bold">Back to Dashboard</v-btn>
     </div>
 
-    <v-card class="glass-card pa-6 mb-6">
-       <div class="d-flex justify-space-between align-start">
-         <div>
-            <div class="d-flex align-center mb-2">
-              <h1 class="text-h4 font-weight-bold mr-4">{{ key.name }}</h1>
-              <v-chip color="success" variant="outlined" class="font-weight-bold text-uppercase">{{ key.type }}</v-chip>
-            </div>
-            <div class="text-h6 text-medium-emphasis mb-4">{{ key.email }}</div>
-            
-            <div class="d-flex align-center text-caption font-mono text-disabled">
-               <v-icon size="small" class="mr-1">mdi-fingerprint</v-icon>
-               {{ key.fingerprint }}
+    <v-card class="glass-card pa-8 mb-8 rounded-xl border-primary shadow-glow overflow-hidden position-relative">
+       <div class="bg-glow"></div>
+       <div class="d-flex flex-column flex-md-row justify-space-between align-start gap-6 position-relative" style="z-index: 1;">
+         <div class="d-flex align-center">
+            <v-avatar color="primary" variant="tonal" size="80" class="mr-6 rounded-xl border-primary shadow-glow">
+              <span class="text-h3 font-weight-black">{{ key.name.charAt(0).toUpperCase() }}</span>
+            </v-avatar>
+            <div>
+               <div class="d-flex align-center flex-wrap gap-3 mb-2">
+                 <h1 class="text-h3 font-weight-black text-white tracking-tighter">{{ key.name }}</h1>
+                 <v-chip color="primary" variant="flat" size="small" class="font-weight-black text-uppercase">{{ key.type }}</v-chip>
+               </div>
+               <div class="text-h6 text-medium-emphasis mb-4">{{ key.email }}</div>
+               
+               <div class="d-flex align-center px-4 py-2 rounded-lg bg-black-alpha-40 border-1 text-caption font-mono text-primary w-fit">
+                  <v-icon size="small" class="mr-2">mdi-fingerprint</v-icon>
+                  {{ key.fingerprint }}
+               </div>
             </div>
          </div>
          
-         <div class="d-flex gap-2">
-            <v-btn color="primary" variant="flat" prepend-icon="mdi-download" @click="download(key.publicKey, `${key.name}_public.asc`)">Export Public</v-btn>
-            <v-btn color="secondary" variant="flat" prepend-icon="mdi-shield-key" @click="download(key.privateKey, `${key.name}_private.asc`)">Export Private</v-btn>
+         <div class="d-flex flex-column flex-sm-row gap-3 w-100 w-md-auto mt-4 mt-md-0">
+            <v-btn color="primary" variant="elevated" prepend-icon="mdi-download" height="50" class="rounded-xl px-6 font-weight-black shadow-glow" @click="download(key.publicKey, `${key.name}_public.asc`)">Export Public</v-btn>
+            <v-btn color="secondary" variant="tonal" prepend-icon="mdi-shield-key" height="50" class="rounded-xl px-6 font-weight-black" @click="download(key.privateKey, `${key.name}_private.asc`)">Export Private</v-btn>
          </div>
        </div>
     </v-card>
     
     <v-row>
-      <v-col cols="12" md="8">
-        <v-card class="glass-card pa-6">
-          <h3 class="text-h6 font-weight-bold mb-4">Subkeys</h3>
+      <v-col cols="12" lg="8">
+        <v-card class="glass-card pa-8 rounded-xl border-1 overflow-hidden">
+          <div class="d-flex align-center justify-space-between mb-8">
+            <h3 class="text-h5 font-weight-black uppercase tracking-widest text-primary">Cryptographic Subkeys</h3>
+            <v-dialog v-model="showAddSubkey" max-width="550">
+                <template #activator="{ props }">
+                  <v-btn v-bind="props" color="primary" variant="tonal" prepend-icon="mdi-plus" class="rounded-lg font-weight-black">Add Subkey</v-btn>
+                </template>
+                <v-card class="glass-card pa-6 rounded-xl border-1 overflow-visible">
+                  <h3 class="text-h5 font-weight-black mb-1">New Identity Subkey</h3>
+                  <p class="text-caption text-disabled mb-8 uppercase tracking-widest">Expand your key capability</p>
+                  
+                  <v-row>
+                    <v-col cols="12" sm="6">
+                      <v-select
+                        v-model="subkeyForm.type"
+                        label="Usage Type"
+                        :items="[{title: 'Signing Key', value: 'sign'}, {title: 'Encryption Key', value: 'encrypt'}, {title: 'Authentication Key', value: 'auth'}]"
+                        variant="solo-filled"
+                        class="custom-input"
+                        rounded="lg"
+                        menu-props="{ contentClass: 'glass-panel' }"
+                      />
+                    </v-col>
+                    <v-col cols="12" sm="6">
+                      <v-select
+                        v-model="subkeyForm.algo"
+                        label="Algorithm"
+                        :items="[{title: 'ECC', value: 'ecc'}, {title: 'RSA', value: 'rsa'}]"
+                        variant="solo-filled"
+                        class="custom-input"
+                        rounded="lg"
+                        menu-props="{ contentClass: 'glass-panel' }"
+                      />
+                    </v-col>
+                    <v-col cols="12">
+                      <v-select
+                        v-if="subkeyForm.algo === 'ecc'"
+                        v-model="subkeyForm.size"
+                        label="Elliptic Curve"
+                        :items="[{title: 'Curve25519', value: 25519}, {title: 'NIST P-256', value: 256}]"
+                        variant="solo-filled"
+                        class="custom-input"
+                        rounded="lg"
+                      />
+                      <v-select
+                        v-if="subkeyForm.algo === 'rsa'"
+                        v-model="subkeyForm.size"
+                        label="RSA Modulus"
+                        :items="[{title: '2048 bits', value: 2048}, {title: '4096 bits', value: 4096}]"
+                        variant="solo-filled"
+                        class="custom-input"
+                        rounded="lg"
+                      />
+                    </v-col>
+                    <v-col cols="12">
+                      <v-text-field
+                        v-model="subkeyForm.passphrase"
+                        label="Main Key Passphrase"
+                        type="password"
+                        variant="solo-filled"
+                        class="custom-input"
+                        rounded="lg"
+                        persistent-hint
+                        hint="Required to authenticate subkey addition"
+                      />
+                    </v-col>
+                  </v-row>
+                  
+                  <div class="d-flex justify-end gap-3 mt-8">
+                    <v-btn variant="text" @click="showAddSubkey = false">Cancel</v-btn>
+                    <v-btn color="primary" class="font-weight-black rounded-lg px-8" height="48" :loading="subkeyLoading" @click="handleAddSubkey">Generate Subkey</v-btn>
+                  </div>
+                </v-card>
+              </v-dialog>
+          </div>
           
-          <v-table class="bg-transparent">
+          <v-table class="bg-transparent custom-table">
             <thead>
               <tr>
-                <th class="text-left">ID</th>
-                <th class="text-left">Type</th>
-                <th class="text-left">Algorithm</th>
-                <th class="text-left">Size</th>
-                <th class="text-left">Created</th>
-                <th class="text-left">Expires</th>
+                <th class="text-left font-weight-black grey-text uppercase">Identity ID</th>
+                <th class="text-left font-weight-black grey-text uppercase">Purpose</th>
+                <th class="text-left font-weight-black grey-text uppercase">Cipher</th>
+                <th class="text-left font-weight-black grey-text uppercase">Created</th>
+                <th class="text-left font-weight-black grey-text uppercase">Status</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="subkey in subkeys" :key="subkey.id">
-                 <td class="font-mono text-caption">
-                    {{ subkey.id ? subkey.id.substring(8) : 'Pending' }}
-                    <v-chip v-if="subkey.isPrimary" size="x-small" color="primary" class="ml-2">Primary</v-chip>
+              <tr v-for="subkey in subkeys" :key="subkey.id" class="table-row">
+                 <td class="font-mono text-caption text-primary font-weight-bold">
+                    #{{ subkey.id ? subkey.id.substring(8) : 'PENDING' }}
                  </td>
                  <td>
-                     <div class="d-flex align-center">
-                         <v-icon v-if="subkey.isPrimary || subkey.type ==='certify' || subkey.type === 'sign'" icon="mdi-shield-account" size="small" color="secondary" class="mr-2"/>
-                         <v-icon v-else-if="subkey.type === 'encrypt'" icon="mdi-shield-lock" size="small" color="secondary" class="mr-2"/>
-                         <v-icon v-else icon="mdi-shield-check" size="small" color="secondary" class="mr-2"/>
-                         <span class="text-capitalize">{{ subkey.type || 'Unknown' }}</span>
-                     </div>
+                    <div class="d-flex align-center">
+                        <v-icon v-if="subkey.isPrimary || subkey.type ==='certify' || subkey.type === 'sign'" icon="mdi-shield-account" size="small" color="primary" class="mr-2"/>
+                        <v-icon v-else-if="subkey.type === 'encrypt'" icon="mdi-shield-lock" size="small" color="secondary" class="mr-2"/>
+                        <v-icon v-else icon="mdi-shield-check" size="small" color="info" class="mr-2"/>
+                        <span class="text-capitalize font-weight-bold">{{ subkey.type || 'System' }}</span>
+                    </div>
                  </td>
-                 <td>{{ subkey.algo }}</td>
-                 <td>{{ subkey.curve || subkey.bits + ' bits' }}</td>
-                 <td>{{ new Date(subkey.created).toLocaleDateString() }}</td>
-                 <td>{{ subkey.expiry ? new Date(subkey.expiry).toLocaleDateString() : 'Never' }}</td>
+                 <td class="text-caption font-weight-medium">{{ subkey.algo }} / {{ subkey.curve || subkey.bits + 'b' }}</td>
+                 <td class="text-caption">{{ new Date(subkey.created).toLocaleDateString() }}</td>
+                 <td>
+                    <v-chip size="x-small" :color="subkey.isPrimary ? 'primary' : 'success'" variant="tonal" class="font-weight-black">
+                      {{ subkey.isPrimary ? 'PRIMARY' : 'ACTIVE' }}
+                    </v-chip>
+                 </td>
               </tr>
             </tbody>
           </v-table>
-          
-           <div class="mt-6 text-center">
-              <v-dialog v-model="showAddSubkey" max-width="500">
-                <template #activator="{ props }">
-                  <v-btn v-bind="props" variant="outlined" color="primary" prepend-icon="mdi-plus">Add Subkey</v-btn>
-                </template>
-                <v-card class="glass-card">
-                  <v-card-title class="text-h5 font-weight-bold">Add New Subkey</v-card-title>
-                  <v-card-text>
-                    <v-select
-                      v-model="subkeyForm.type"
-                      label="Key Type"
-                      :items="[{title: 'Signing Key', value: 'sign'}, {title: 'Encryption Key', value: 'encrypt'}, {title: 'Authentication Key', value: 'auth'}]"
-                      variant="solo-filled"
-                      menu-props="{ contentClass: 'glass-panel' }"
-                    />
-                    
-                    <v-select
-                      v-model="subkeyForm.algo"
-                      label="Algorithm"
-                      :items="[{title: 'ECC', value: 'ecc'}, {title: 'RSA', value: 'rsa'}]"
-                      variant="solo-filled"
-                      menu-props="{ contentClass: 'glass-panel' }"
-                    />
-                    
-                     <v-select
-                      v-if="subkeyForm.algo === 'ecc'"
-                      v-model="subkeyForm.size"
-                      label="Curve"
-                      :items="[{title: 'Curve25519', value: 25519}, {title: 'NIST P-256', value: 256}, {title: 'NIST P-384', value: 384}, {title: 'NIST P-521', value: 521}]"
-                      variant="solo-filled"
-                      menu-props="{ contentClass: 'glass-panel' }"
-                    />
-
-                    <v-select
-                      v-if="subkeyForm.algo === 'rsa'"
-                      v-model="subkeyForm.size"
-                      label="Key Size"
-                      :items="[
-                        {title: '1024 bits (Weak)', value: 1024},
-                        {title: '2048 bits', value: 2048},
-                        {title: '3072 bits', value: 3072},
-                        {title: '4096 bits', value: 4096},
-                        {title: '8192 bits', value: 8192}
-                      ]"
-                      variant="solo-filled"
-                      menu-props="{ contentClass: 'glass-panel' }"
-                    />
-
-                    <v-select
-                      v-model="subkeyForm.expiry"
-                      label="Expiration"
-                      :items="[
-                        {title: 'Never', value: 0},
-                        {title: '30 Days', value: 2592000},
-                        {title: '90 Days', value: 7776000},
-                        {title: '6 Months', value: 15552000},
-                        {title: '1 Year', value: 31536000},
-                        {title: '2 Years', value: 63072000},
-                        {title: '3 Years', value: 94608000},
-                        {title: '5 Years', value: 157680000}
-                      ]"
-                      variant="solo-filled"
-                      menu-props="{ contentClass: 'glass-panel' }"
-                    />
-                    
-                    <v-text-field
-                      v-model="subkeyForm.passphrase"
-                      label="Passphrase (to unlock primary key)"
-                      type="password"
-                      variant="solo-filled"
-                      hint="Required to sign the new subkey"
-                      persistent-hint
-                    />
-                  </v-card-text>
-                  <v-card-actions>
-                    <v-spacer/>
-                    <v-btn color="white" variant="text" @click="showAddSubkey = false">Cancel</v-btn>
-                    <v-btn color="primary" :loading="subkeyLoading" @click="handleAddSubkey">Generate Subkey</v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
-           </div>
         </v-card>
       </v-col>
       
-      <v-col cols="12" md="4">
-        <v-card class="glass-card pa-6 h-100">
-           <h3 class="text-h6 font-weight-bold mb-4 text-error">Danger Zone</h3>
-           <p class="text-caption text-medium-emphasis mb-4">
-             Deleting this key will remove it from your browser storage permanently.
-             Make sure you have a backup.
+      <v-col cols="12" lg="4">
+        <v-card class="glass-card pa-8 rounded-xl border-1 h-100 bg-black-alpha-20 border-error-muted">
+           <div class="d-flex align-center mb-6 text-error">
+             <v-icon class="mr-3">mdi-alert-octagon</v-icon>
+             <h3 class="text-h6 font-weight-black uppercase tracking-wider">Danger Zone</h3>
+           </div>
+           
+           <p class="text-body-2 text-disabled mb-8 line-height-relaxed">
+             Deleting this key pair is irreversible. All messages encrypted with this key will become <strong>permanently inaccessible</strong> unless you have an external backup of the private key.
            </p>
-           <v-dialog v-model="showDeleteConfirm" max-width="400">
+           
+           <v-dialog v-model="showDeleteConfirm" max-width="450">
                <template #activator="{ props }">
-                    <v-btn v-bind="props" color="error" block variant="outlined" prepend-icon="mdi-delete">Delete Key Pair</v-btn>
+                    <v-btn v-bind="props" color="error" block variant="tonal" height="54" class="rounded-xl font-weight-black" prepend-icon="mdi-delete-forever">Destroy Key Pair</v-btn>
                </template>
-               <v-card class="glass-card">
-                   <v-card-title class="text-h5 font-weight-bold text-error">Delete Key?</v-card-title>
-                   <v-card-text>
-                       Are you sure you want to delete this key pair? This action cannot be undone.
+               <v-card class="glass-card pa-8 rounded-xl border-1">
+                   <div class="text-center mb-6">
+                     <v-avatar color="error" variant="tonal" size="70" class="mb-4">
+                       <v-icon size="40">mdi-delete-alert</v-icon>
+                     </v-avatar>
+                     <h2 class="text-h4 font-weight-black text-white">Security Wipe?</h2>
+                   </div>
+                   <v-card-text class="text-center text-medium-emphasis">
+                       This will permanently delete <strong>{{ key.name }}</strong> from local storage. Are you absolutely certain?
                    </v-card-text>
-                   <v-card-actions>
-                       <v-spacer/>
-                       <v-btn color="white" variant="text" @click="showDeleteConfirm = false">Cancel</v-btn>
-                       <v-btn color="error" @click="handleDeleteConfirm">Confirm Delete</v-btn>
+                   <v-card-actions class="mt-8 gap-3">
+                       <v-btn variant="tonal" block size="large" class="rounded-lg font-weight-bold" @click="showDeleteConfirm = false">Abandon</v-btn>
+                       <v-btn color="error" variant="flat" block size="large" class="rounded-lg font-weight-black" @click="handleDeleteConfirm">Confirm Wipe</v-btn>
                    </v-card-actions>
                </v-card>
            </v-dialog>
@@ -261,3 +266,68 @@ useHead({
   title: computed(() => key.value ? `Manage ${key.value.name} - VimPGP` : 'Manage Key')
 })
 </script>
+
+<style scoped>
+.gap-3 { gap: 12px; }
+.gap-6 { gap: 24px; }
+.w-fit { width: fit-content; }
+
+.bg-black-alpha-40 {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.bg-glow {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(var(--v-theme-primary), 0.1) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.shadow-glow {
+  box-shadow: 0 4px 20px rgba(var(--v-theme-primary), 0.3) !important;
+}
+
+.grey-text {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+}
+
+.custom-table :deep(th) {
+  border-bottom: 2px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.custom-table :deep(td) {
+  padding: 20px 16px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
+}
+
+.table-row {
+  transition: background-color 0.2s ease;
+}
+
+.table-row:hover {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+}
+
+.border-error-muted {
+  border: 1px solid rgba(var(--v-theme-error), 0.2) !important;
+}
+
+.line-height-relaxed {
+  line-height: 1.6;
+}
+
+.custom-input :deep(.v-field) {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.tracking-tighter {
+  letter-spacing: -2px;
+}
+</style>

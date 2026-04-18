@@ -1,5 +1,5 @@
 <template>
-  <div class="py-6">
+  <div class="py-6 index-overlay">
     <!-- Hero Section -->
     <v-row>
       <v-col cols="12" md="4" lg="3">
@@ -8,38 +8,42 @@
             <span class="text-white">VIM</span><span class="text-gradient">PGP</span>
           </h1>
           <p class="text-body-2 text-medium-emphasis mb-6 line-height-relaxed">
-            VimPGP is an <strong>Open Source</strong>, free, online and secure PGP key generator. 
-            All code runs on the client-side using the <strong>OpenPGP.js</strong> library. 
+            VimPGP is a premium, <strong>Open Source</strong>, client-side PGP toolset. 
+            All cryptographic operations happen in your browser. 
             <br/><br/>
-            No servers. No tracking. Feel free to <strong>unplug the Internet</strong> before use. 
-            Check our <NuxtLink to="/faq" class="text-primary font-weight-bold text-decoration-none">FAQ</NuxtLink> for more information.
+            <strong>No data ever leaves your device.</strong> No accounts, no cookies, no tracking. Just pure privacy.
           </p>
 
           <v-divider class="mb-6" style="opacity: 0.1"/>
 
           <div class="glass-card pa-6 rounded-xl border-primary mb-8 position-relative overflow-hidden glow-box">
-            <div class="d-flex align-center justify-space-between mb-4 text-caption">
-              <span class="text-disabled font-weight-bold uppercase tracking-widest">Privacy</span>
-              <v-chip size="small" color="success" variant="tonal" class="font-weight-black px-3"><v-icon start size="14">mdi-lock-check</v-icon>100% SECURE</v-chip>
-            </div>
-            <div class="d-flex align-center justify-space-between mb-4 text-caption">
-              <span class="text-disabled font-weight-bold uppercase tracking-widest">Performance</span>
-              <v-chip size="small" color="info" variant="tonal" class="font-weight-black px-3"><v-icon start size="14">mdi-lightning-bolt</v-icon>ZERO LATENCY</v-chip>
-            </div>
-            <div class="d-flex align-center justify-space-between text-caption">
-              <span class="text-disabled font-weight-bold uppercase tracking-widest">Engine</span>
-              <v-chip size="small" color="primary" variant="tonal" class="font-weight-black px-3"><v-icon start size="14">mdi-cog-outline</v-icon>OPENPGP.JS</v-chip>
-            </div>
+             <div class="bg-glow"></div>
+             <div class="d-flex align-center justify-space-between mb-4 text-caption">
+               <span class="text-disabled font-weight-bold uppercase tracking-widest">Security</span>
+               <v-chip size="small" color="success" variant="tonal" class="font-weight-black px-3">ED25519 / RSA</v-chip>
+             </div>
+             <div class="d-flex align-center justify-space-between mb-4 text-caption">
+               <span class="text-disabled font-weight-bold uppercase tracking-widest">Network</span>
+               <v-chip size="small" color="info" variant="tonal" class="font-weight-black px-3"><v-icon start size="14">mdi-wifi-off</v-icon>OFFLINE OK</v-chip>
+             </div>
+             <div class="d-flex align-center justify-space-between text-caption">
+               <span class="text-disabled font-weight-bold uppercase tracking-widest">Privacy</span>
+               <v-chip size="small" color="primary" variant="tonal" class="font-weight-black px-3"><v-icon start size="14">mdi-incognito</v-icon>LOCAL ONLY</v-chip>
+             </div>
           </div>
 
-          <v-btn block color="primary" size="x-large" to="/generate" prepend-icon="mdi-creation" class="font-weight-black rounded-xl mb-4 shadow-glow text-h6" height="64" variant="elevated">
-            Create Key Pair
+          <v-btn block color="primary" size="x-large" to="/secure" prepend-icon="mdi-shield-lock" class="font-weight-black rounded-xl mb-4 shadow-glow" height="64">
+            Secure Messaging
+          </v-btn>
+          
+          <v-btn block variant="tonal" color="primary" size="x-large" to="/generate" prepend-icon="mdi-key-plus" class="font-weight-black rounded-xl mb-8" height="54">
+            New Key Pair
           </v-btn>
 
           <div class="glass-card pa-4 rounded-xl text-caption border-1 bg-black-alpha-20 d-flex align-start gap-3">
             <v-icon size="24" color="secondary" class="mt-1">mdi-shield-check</v-icon>
             <div class="line-height-tight text-disabled">
-              <span class="text-white font-weight-bold">Zero-knowledge architecture.</span> Your keys never leave your physical device. No servers. No tracking.
+              <span class="text-white font-weight-bold">Military-Grade.</span> Standard OpenPGP implementation verified against modern security benchmarks.
             </div>
           </div>
         </div>
@@ -59,40 +63,36 @@ useHead({
 </script>
 
 <style scoped>
-.border-l-primary {
-  border-left: 4px solid var(--v-theme-primary);
-}
-
-.hero-image-stack {
+.index-overlay {
   position: relative;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  z-index: 1;
 }
 
-.floating-card-1 {
-  position: absolute;
-  top: -20px;
-  left: 20px;
-  z-index: 2;
-  animation: float 6s infinite ease-in-out;
+.text-gradient {
+  background: linear-gradient(135deg, var(--v-theme-primary) 0%, #B338FF 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.floating-card-2 {
+.bg-glow {
   position: absolute;
-  bottom: -20px;
-  right: 20px;
-  z-index: 2;
-  animation: float 6s infinite ease-in-out -3s;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(var(--v-theme-primary), 0.1) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .glow-box {
-  box-shadow: 0 0 30px rgba(var(--v-theme-primary), 0.05) inset;
+  box-shadow: 0 0 30px rgba(var(--v-theme-primary), 0.1);
+  border: 1px solid rgba(var(--v-theme-primary), 0.2) !important;
 }
 
 .bg-black-alpha-20 {
-  background-color: rgba(0,0,0,0.2) !important;
+  background-color: rgba(0,0,0,0.3) !important;
 }
 
 .gap-3 {
@@ -103,13 +103,12 @@ useHead({
   line-height: 1.4;
 }
 
-.hover-border-primary {
-  transition: all 0.3s ease;
+.shadow-glow {
+  box-shadow: 0 4px 20px rgba(var(--v-theme-primary), 0.3) !important;
 }
 
-.hover-border-primary:hover {
-  border-color: rgba(var(--v-theme-primary), 0.5) !important;
-  transform: translateY(-5px);
+.line-height-relaxed {
+  line-height: 1.8;
 }
 
 @keyframes float {

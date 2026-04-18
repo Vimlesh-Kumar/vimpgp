@@ -1,19 +1,34 @@
 <template>
   <div>
-    <div class="d-flex align-center mb-4">
-       <h2 class="text-h5 font-weight-black uppercase tracking-widest text-primary">Your Keyring</h2>
-       <!-- <v-divider class="ml-4" style="opacity: 0.1"/> -->
+    <div class="d-flex align-center justify-space-between mb-6">
+       <h2 class="text-h5 font-weight-black uppercase tracking-widest text-primary d-flex align-center">
+         <v-icon color="primary" class="mr-2">mdi-key-chain-variant</v-icon>
+         Your Keyring
+       </h2>
+       
+       <div class="d-flex gap-2">
+         <v-btn variant="tonal" color="secondary" prepend-icon="mdi-import" class="rounded-lg font-weight-bold" @click="importDialog = true">
+           Import Key
+         </v-btn>
+         <v-btn color="primary" prepend-icon="mdi-plus" to="/generate" class="rounded-lg font-weight-bold shadow-glow">
+           New Pair
+         </v-btn>
+       </div>
     </div>
     
     <div v-if="keys.length === 0" class="text-center py-16 glass-card rounded-xl border-dashed position-relative overflow-hidden premium-card">
+       <div class="bg-glow"></div>
        <v-avatar color="primary" variant="tonal" size="100" class="mb-6 elevation-8 shadow-glow pulse-avatar">
          <v-icon icon="mdi-shield-key-outline" size="50" color="primary"/>
        </v-avatar>
-       <div class="text-h4 font-weight-black mb-3 text-gradient">No keys found</div>
-       <div class="text-body-1 text-medium-emphasis mb-8 line-height-relaxed" style="max-width: 400px; margin: 0 auto;">
-         Your secure keyring is currently empty. Generate a new cryptographic key pair to start encrypting and signing your messages.
+       <div class="text-h4 font-weight-black mb-3 text-gradient">Secure Keyring Empty</div>
+       <div class="text-body-1 text-medium-emphasis mb-8 line-height-relaxed" style="max-width: 450px; margin: 0 auto;">
+         Your local cryptographic vault is ready. Create your first identity or import an existing PGP key to start secure communication.
        </div>
-       <v-btn color="primary" size="x-large" to="/generate" prepend-icon="mdi-creation" elevation="8" class="font-weight-black rounded-lg px-8">Generate Key Pair</v-btn>
+       <div class="d-flex justify-center gap-4">
+         <v-btn color="primary" size="x-large" to="/generate" prepend-icon="mdi-creation" elevation="8" class="font-weight-black rounded-lg px-8">Generate Key Pair</v-btn>
+         <v-btn color="secondary" variant="tonal" size="x-large" prepend-icon="mdi-import" class="font-weight-black rounded-lg px-8" @click="importDialog = true">Import Key</v-btn>
+       </div>
     </div>
 
     <v-row v-else class="g-6 align-stretch">
@@ -72,7 +87,7 @@
               
               <v-tooltip text="Copy Private Key" location="top" open-delay="100">
                 <template #activator="{ props }">
-                  <v-btn v-bind="props" size="medium" variant="tonal" color="secondary" icon="mdi-shield-key" class="rounded-lg action-btn-hover" @click="copy(key.privateKey, 'Private Key')"/>
+                   <v-btn v-bind="props" size="medium" variant="tonal" color="secondary" icon="mdi-shield-key" class="rounded-lg action-btn-hover" @click="copy(key.privateKey, 'Private Key')"/>
                 </template>
               </v-tooltip>
             </div>
@@ -97,6 +112,29 @@
         </v-card>
       </v-col>
     </v-row>
+
+    <!-- Import Dialog -->
+    <v-dialog v-model="importDialog" max-width="600">
+      <v-card class="glass-card pa-6 rounded-xl border-1 overflow-visible">
+        <h3 class="text-h5 font-weight-black mb-1">Import PGP Key</h3>
+        <p class="text-caption text-disabled mb-6 uppercase tracking-widest">Paste your armored public or private key</p>
+        
+        <v-textarea
+          v-model="importArmoredKey"
+          placeholder="-----BEGIN PGP KEY BLOCK-----..."
+          variant="solo-filled"
+          rows="10"
+          class="custom-textarea font-mono text-caption"
+          rounded="lg"
+          hide-details
+        />
+        
+        <div class="d-flex justify-end gap-3 mt-8">
+          <v-btn variant="text" @click="importDialog = false">Cancel</v-btn>
+          <v-btn color="primary" class="font-weight-black rounded-lg px-6" :loading="importing" @click="handleImport">Import into Keyring</v-btn>
+        </div>
+      </v-card>
+    </v-dialog>
     
     <v-snackbar v-model="snackbar" :color="snackbarColor" location="bottom right">
       {{ snackbarText }}
@@ -108,14 +146,37 @@
 </template>
 
 <script setup lang="ts">
-const { keys, deleteKey, initKeys } = usePgp()
+const { keys, deleteKey, initKeys, importKey } = usePgp()
 const snackbar = ref(false)
 const snackbarText = ref('')
 const snackbarColor = ref('success')
 
+const importDialog = ref(false)
+const importing = ref(false)
+const importArmoredKey = ref('')
+
 onMounted(() => {
   initKeys()
 })
+
+const handleImport = async () => {
+  if (!importArmoredKey.value) return
+  importing.value = true
+  try {
+    await importKey(importArmoredKey.value)
+    snackbarText.value = 'Key successfully imported'
+    snackbarColor.value = 'success'
+    snackbar.value = true
+    importDialog.value = false
+    importArmoredKey.value = ''
+  } catch (e: any) {
+    snackbarText.value = 'Failed to import: ' + e.message
+    snackbarColor.value = 'error'
+    snackbar.value = true
+  } finally {
+    importing.value = false
+  }
+}
 
 const copy = (text: string, type: string) => {
   navigator.clipboard.writeText(text)
