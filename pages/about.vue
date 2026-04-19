@@ -57,9 +57,6 @@
               </p>
               
               <div class="d-flex flex-column flex-sm-row align-start align-sm-center gap-6 mt-8">
-                <!-- <v-avatar size="64" class="border-primary shadow-glow" color="primary" variant="tonal">
-                  <v-icon size="32">mdi-account-code</v-icon>
-                </v-avatar> -->
                 <div>
                    <div class="text-caption text-disabled font-weight-bold uppercase tracking-widest">Architect & Lead Developer</div>
                    <div class="text-h6 font-weight-black text-white">Vimlesh Kumar</div>

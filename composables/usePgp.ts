@@ -8,12 +8,14 @@ const getEccCurve = (size: number): string => {
 };
 
 const generateSecureHex = (len: number): string => {
-    if (typeof window !== 'undefined' && window.crypto) {
+    const secureCrypto = typeof window !== 'undefined' ? window.crypto : (globalThis as any).crypto;
+
+    if (secureCrypto?.getRandomValues) {
         const array = new Uint8Array(len / 2);
-        window.crypto.getRandomValues(array);
+        secureCrypto.getRandomValues(array);
         return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
     }
-    return Math.random().toString(16).substring(2, 2 + len).padEnd(len, '0');
+    throw new Error('Cryptographically secure random number generation is not available in this environment.');
 };
 
 

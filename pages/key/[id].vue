@@ -113,11 +113,11 @@
           <v-table class="bg-transparent custom-table">
             <thead>
               <tr>
-                <th class="text-left font-weight-black grey-text uppercase">Identity ID</th>
-                <th class="text-left font-weight-black grey-text uppercase">Purpose</th>
-                <th class="text-left font-weight-black grey-text uppercase">Cipher</th>
-                <th class="text-left font-weight-black grey-text uppercase">Created</th>
-                <th class="text-left font-weight-black grey-text uppercase">Status</th>
+                <th id="th-id" scope="col" class="text-left font-weight-black grey-text uppercase">Identity ID</th>
+                <th id="th-purpose" scope="col" class="text-left font-weight-black grey-text uppercase">Purpose</th>
+                <th id="th-cipher" scope="col" class="text-left font-weight-black grey-text uppercase">Cipher</th>
+                <th id="th-created" scope="col" class="text-left font-weight-black grey-text uppercase">Created</th>
+                <th id="th-status" scope="col" class="text-left font-weight-black grey-text uppercase">Status</th>
               </tr>
             </thead>
             <tbody>
