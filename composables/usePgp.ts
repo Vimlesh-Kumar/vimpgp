@@ -8,6 +8,7 @@ const getEccCurve = (size: number): string => {
 };
 
 const generateSecureHex = (len: number): string => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const secureCrypto = typeof window !== 'undefined' ? window.crypto : (globalThis as any).crypto;
 
     if (secureCrypto?.getRandomValues) {
