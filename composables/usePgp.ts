@@ -7,6 +7,16 @@ const getEccCurve = (size: number): string => {
     return 'curve25519';
 };
 
+const generateSecureHex = (len: number): string => {
+    if (typeof window !== 'undefined' && window.crypto) {
+        const array = new Uint8Array(len / 2);
+        window.crypto.getRandomValues(array);
+        return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+    }
+    return Math.random().toString(16).substring(2, 2 + len).padEnd(len, '0');
+};
+
+
 
 export interface PgpKeyRecord {
     id: string;
@@ -133,8 +143,8 @@ export const usePgp = () => {
 
             const newSubkey = {
 
-                id: (Math.random().toString(16) + "0000000000000000").substring(2, 18),
-                fingerprint: (Math.random().toString(16) + Math.random().toString(16)).substring(2),
+                id: generateSecureHex(16),
+                fingerprint: generateSecureHex(40),
                 created: new Date().toISOString(),
                 algo: subkeyAlgo,
                 bits: subkeyBits,
@@ -143,6 +153,7 @@ export const usePgp = () => {
                 type: type,
                 expiry: subkeyExpiry
             };
+
 
             const currentKey = keys.value[keyIndex];
             if (!currentKey) throw new Error("Key record missing");
