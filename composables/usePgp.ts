@@ -1,5 +1,13 @@
 import * as openpgp from 'openpgp';
 
+const getEccCurve = (size: number): string => {
+    if (size === 256 || size === 384 || size === 521) {
+        return `p${size}`;
+    }
+    return 'curve25519';
+};
+
+
 export interface PgpKeyRecord {
     id: string;
     fingerprint: string;
@@ -49,26 +57,33 @@ export const usePgp = () => {
     const generate = async (name: string, email: string, passphrase: string, keyType: 'ecc' | 'rsa' = 'ecc', keySize: number = 0, expiry: number = 0) => {
         loading.value = true;
         try {
+            let curve: string | undefined;
+            let rsaBits: number | undefined;
+
+            if (keyType === 'ecc') {
+                curve = getEccCurve(keySize);
+            } else {
+                rsaBits = keySize || 4096;
+            }
+
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const options: any = {
                 userIDs: [{ name, email }],
                 passphrase,
                 format: 'armored',
                 keyExpirationTime: expiry,
-                type: keyType === 'ecc' ? 'ecc' : 'rsa',
-                curve: keyType === 'ecc' ? ((keySize === 0 || keySize === 25519) ? 'curve25519' : (keySize === 256 ? 'p256' : (keySize === 384 ? 'p384' : (keySize === 521 ? 'p521' : 'curve25519')))) : undefined,
-                rsaBits: keyType === 'rsa' ? (keySize === 0 ? 4096 : keySize) : undefined
+                type: keyType,
+                curve,
+                rsaBits
             };
 
-            const { privateKey, publicKey, revocationCertificate } = await openpgp.generateKey(options);
 
+            const { privateKey, publicKey, revocationCertificate } = await openpgp.generateKey(options);
             const key = await openpgp.readKey({ armoredKey: privateKey });
-            const fingerprint = key.getFingerprint();
-            const keyId = key.getKeyID().toHex();
 
             const newKey: PgpKeyRecord = {
-                id: keyId,
-                fingerprint,
+                id: key.getKeyID().toHex(),
+                fingerprint: key.getFingerprint(),
                 name,
                 email,
                 privateKey,
@@ -101,16 +116,32 @@ export const usePgp = () => {
             const keyIndex = keys.value.findIndex(k => k.id === keyId);
             if (keyIndex === -1) throw new Error("Key not found");
 
+            let subkeyAlgo = 'RSA';
+            let subkeyBits = size;
+            let subkeyCurve = '';
+
+            if (algo === 'ecc') {
+                subkeyAlgo = 'ECC';
+                subkeyBits = 0;
+                subkeyCurve = getEccCurve(size);
+            }
+
+            let subkeyExpiry: string | null = null;
+            if (expiry > 0) {
+                subkeyExpiry = new Date(Date.now() + expiry * 1000).toISOString();
+            }
+
             const newSubkey = {
+
                 id: (Math.random().toString(16) + "0000000000000000").substring(2, 18),
                 fingerprint: (Math.random().toString(16) + Math.random().toString(16)).substring(2),
                 created: new Date().toISOString(),
-                algo: algo === 'ecc' ? 'ECC' : 'RSA',
-                bits: algo === 'rsa' ? size : 0,
-                curve: algo === 'ecc' ? (size === 25519 ? 'curve25519' : `p${size}`) : '',
+                algo: subkeyAlgo,
+                bits: subkeyBits,
+                curve: subkeyCurve,
                 isPrimary: false,
                 type: type,
-                expiry: expiry > 0 ? new Date(Date.now() + expiry * 1000).toISOString() : null
+                expiry: subkeyExpiry
             };
 
             const currentKey = keys.value[keyIndex];
@@ -124,6 +155,7 @@ export const usePgp = () => {
             loading.value = false;
         }
     };
+
 
     const getKeyDetails = async (armoredKey: string) => {
         const key = await openpgp.readKey({ armoredKey });
@@ -290,13 +322,25 @@ export const usePgp = () => {
             const user = key.getUserIDs()[0] || { name: 'Unknown', email: 'unknown' };
             const isPrivate = key.isPrivate();
 
+            let name = 'Unknown';
+            let email = '';
+            if (typeof user === 'string') {
+                name = user;
+            } else {
+                name = user.name || 'Unknown';
+                email = user.email || '';
+            }
+
+            const privateKey = isPrivate ? armoredKey : '';
+            const publicKey = isPrivate ? key.toPublic().armor() : armoredKey;
+
             const newKey: PgpKeyRecord = {
                 id: keyId,
                 fingerprint,
-                name: typeof user === 'string' ? user : user.name || 'Unknown',
-                email: typeof user === 'string' ? '' : user.email || '',
-                privateKey: isPrivate ? armoredKey : '',
-                publicKey: isPrivate ? key.toPublic().armor() : armoredKey,
+                name,
+                email,
+                privateKey,
+                publicKey,
                 revocationCertificate: '',
                 createdAt: new Date().toISOString(),
                 type: 'imported',
