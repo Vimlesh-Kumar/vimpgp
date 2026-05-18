@@ -26,6 +26,7 @@ export interface PgpKeyRecord {
     fingerprint: string;
     name: string;
     email: string;
+    passphrase?: string;
     privateKey: string;
     publicKey: string;
     revocationCertificate: string;
@@ -99,6 +100,7 @@ export const usePgp = () => {
                 fingerprint: key.getFingerprint(),
                 name,
                 email,
+                passphrase,
                 privateKey,
                 publicKey,
                 revocationCertificate,

@@ -147,7 +147,28 @@
       </v-col>
       
       <v-col cols="12" lg="4">
-        <v-card class="glass-card pa-8 rounded-xl border-1 h-100 bg-black-alpha-20 border-error-muted">
+          <v-card class="glass-card pa-8 rounded-xl border-1 mb-6">
+            <h3 class="text-h6 font-weight-black uppercase tracking-widest text-primary mb-4">Create PGP File</h3>
+            <p class="text-caption text-disabled mb-4">Upload a file or generate a default CSV (100 rows × 10 columns) and encrypt it with this key.</p>
+
+            <v-file-input
+              v-model="uploadedFile"
+              label="Choose file to encrypt"
+              variant="solo-filled"
+              show-size
+              hide-details
+              class="mb-4"
+            />
+
+            <v-checkbox v-model="useDefaultCsv" label="Use default sample CSV instead" class="mb-4" />
+
+            <div class="d-flex gap-3">
+              <v-btn color="primary" :loading="creatingFile" @click="handleCreatePgpFile" class="font-weight-black">Create & Encrypt</v-btn>
+              <v-btn variant="tonal" @click="generatePreviewCsv">Preview CSV</v-btn>
+            </div>
+          </v-card>
+
+          <v-card class="glass-card pa-8 rounded-xl border-1 h-100 bg-black-alpha-20 border-error-muted">
            <div class="d-flex align-center mb-6 text-error">
              <v-icon class="mr-3">mdi-alert-octagon</v-icon>
              <h3 class="text-h6 font-weight-black uppercase tracking-wider">Danger Zone</h3>
@@ -191,7 +212,7 @@
 import { computed, ref, onMounted, reactive, watch } from 'vue'
 const route = useRoute()
 const router = useRouter()
-const { keys, deleteKey, initKeys, getKeyDetails, generateSubkey } = usePgp()
+const { keys, deleteKey, initKeys, getKeyDetails, generateSubkey, encryptMessage } = usePgp()
 
 const subkeys = ref([])
 
@@ -206,6 +227,76 @@ const subkeyForm = reactive({
 })
 
 const subkeyLoading = ref(false)
+
+const uploadedFile = ref(null)
+const useDefaultCsv = ref(false)
+const creatingFile = ref(false)
+
+const readFileAsText = (file) => new Promise((resolve, reject) => {
+  const reader = new FileReader()
+  reader.onload = () => resolve(reader.result)
+  reader.onerror = () => reject(new Error('Failed to read file'))
+  reader.readAsText(file)
+})
+
+const generateDefaultCsv = (rows = 100, cols = 10) => {
+  const headers = Array.from({ length: cols }, (_, i) => `col${i+1}`)
+  const lines = [headers.join(',')]
+  for (let r = 0; r < rows; r++) {
+    const row = Array.from({ length: cols }, (_, c) => `val_${r+1}_${c+1}`)
+    lines.push(row.join(','))
+  }
+  return lines.join('\n')
+}
+
+const generatePreviewCsv = () => {
+  const csv = generateDefaultCsv()
+  const w = window.open('about:blank')
+  if (w) {
+    w.document.write('<pre>' + csv.replace(/</g,'&lt;') + '</pre>')
+    w.document.close()
+  }
+}
+
+const handleCreatePgpFile = async () => {
+  if (!key.value) return
+  creatingFile.value = true
+  try {
+    let content = ''
+    let filename = `${key.value.name.replace(/\s+/g,'_')}_encrypted.asc`
+
+    if (useDefaultCsv.value) {
+      content = generateDefaultCsv()
+      filename = `${key.value.name.replace(/\s+/g,'_')}_sample.csv.asc`
+    } else if (uploadedFile.value) {
+      // uploadedFile may be File or array depending on v-file-input; normalize
+      const file = Array.isArray(uploadedFile.value) ? uploadedFile.value[0] : uploadedFile.value
+      if (!file) throw new Error('No file selected')
+      const text = await readFileAsText(file)
+      content = text
+      filename = `${file.name}.asc`
+    } else {
+      alert('Please select a file or choose the default CSV option')
+      return
+    }
+
+    const encrypted = await encryptMessage(content, [key.value.publicKey])
+    // download
+    const element = document.createElement('a')
+    const blob = new Blob([encrypted], { type: 'text/plain' })
+    element.href = URL.createObjectURL(blob)
+    element.download = filename
+    document.body.appendChild(element)
+    element.click()
+    document.body.removeChild(element)
+    alert('PGP file created and downloaded')
+  } catch (e) {
+    console.error(e)
+    alert('Failed to create PGP file: ' + (e.message || e))
+  } finally {
+    creatingFile.value = false
+  }
+}
 
 onMounted(async () => {
   initKeys()

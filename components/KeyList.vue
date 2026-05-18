@@ -90,6 +90,11 @@
                    <v-btn v-bind="props" size="medium" variant="tonal" color="secondary" icon="mdi-shield-key" class="rounded-lg action-btn-hover" @click="copy(key.privateKey, 'Private Key')"/>
                 </template>
               </v-tooltip>
+              <v-tooltip v-if="key.passphrase" text="Copy Passphrase" location="top" open-delay="100">
+                <template #activator="{ props }">
+                   <v-btn v-bind="props" size="medium" variant="tonal" color="tertiary" icon="mdi-eye" class="rounded-lg action-btn-hover" @click="copy(key.passphrase, 'Passphrase')"/>
+                </template>
+              </v-tooltip>
             </div>
 
             <v-spacer/>

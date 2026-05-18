@@ -37,6 +37,23 @@
               />
             </v-col>
 
+            <v-dialog v-model="createdDialog" max-width="600">
+              <v-card class="glass-card pa-6 rounded-xl">
+                <h3 class="text-h5 font-weight-black mb-2">Identity Created</h3>
+                <p class="text-caption text-disabled mb-6">Save your passphrase securely. It is required to use your private key.</p>
+                <div class="mb-4">
+                  <div class="text-caption font-weight-bold mb-1">Passphrase</div>
+                  <div class="d-flex align-center">
+                    <v-text-field v-model="createdKeyPass" readonly variant="solo-filled" class="flex-grow-1" />
+                    <v-btn icon="mdi-content-copy" variant="tonal" class="ml-2" @click="copy(createdKeyPass, 'Passphrase')"/>
+                  </div>
+                </div>
+                <div class="d-flex justify-end gap-3 mt-6">
+                  <v-btn variant="text" @click="closeCreatedDialog">Close</v-btn>
+                </div>
+              </v-card>
+            </v-dialog>
+
             <v-col cols="12">
               <div class="d-flex justify-space-between align-center mb-2 ml-1">
                 <div class="text-subtitle-2 font-weight-bold text-primary">Master Passphrase</div>
@@ -228,15 +245,28 @@ watch(() => form.algo, (newAlgo) => {
 
 const showPass = ref(false)
 const formRef = ref(null)
+const createdDialog = ref(false)
+const createdKeyPass = ref('')
+
+const copy = (text) => {
+  if (!text) return
+  navigator.clipboard.writeText(text)
+}
+
+const closeCreatedDialog = () => {
+  createdDialog.value = false
+  router.push('/')
+}
 
 const handleGenerate = async () => {
   const { valid } = await formRef.value.validate()
   if (!valid) return
   
   try {
-    await new Promise(r => setTimeout(r, 100)) 
-    await generate(form.name, form.email, form.passphrase, form.algo, form.keySize, form.expiry)
-    router.push('/')
+    await new Promise(r => setTimeout(r, 100))
+    const newKey = await generate(form.name, form.email, form.passphrase, form.algo, form.keySize, form.expiry)
+    createdKeyPass.value = newKey.passphrase || form.passphrase || ''
+    createdDialog.value = true
   } catch (e) {
     console.error(e)
     alert('Error generating key: ' + e.message)
