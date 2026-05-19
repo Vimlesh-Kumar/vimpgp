@@ -160,6 +160,24 @@
               class="mb-4"
             />
 
+            <v-text-field
+              v-model="destFilename"
+              label="Destination filename (optional)"
+              placeholder="myfile.asc or backup.gpg"
+              variant="solo-filled"
+              class="mb-3"
+            />
+
+            <v-select
+              v-model="selectedFormat"
+              :items="[{ title: 'PGP (ASCII armored .asc)', value: 'pgp' }, { title: 'GPG (binary .gpg)', value: 'gpg' } ]"
+              item-title="title"
+              item-value="value"
+              label="Output Format"
+              variant="solo-filled"
+              class="mb-3"
+            />
+
             <v-checkbox v-model="useDefaultCsv" label="Use default sample CSV instead" class="mb-4" />
 
             <div class="d-flex gap-3">
@@ -231,6 +249,8 @@ const subkeyLoading = ref(false)
 const uploadedFile = ref(null)
 const useDefaultCsv = ref(false)
 const creatingFile = ref(false)
+const destFilename = ref('')
+const selectedFormat = ref('pgp')
 
 const readFileAsText = (file) => new Promise((resolve, reject) => {
   const reader = new FileReader()
@@ -263,33 +283,47 @@ const handleCreatePgpFile = async () => {
   creatingFile.value = true
   try {
     let content = ''
-    let filename = `${key.value.name.replace(/\s+/g,'_')}_encrypted.asc`
+    // determine default filename and extension
+    let filename = destFilename.value || `${key.value.name.replace(/\s+/g,'_')}_encrypted`;
+    const format = selectedFormat.value === 'gpg' ? 'binary' : 'armored'
+    const ext = selectedFormat.value === 'gpg' ? '.gpg' : '.asc'
 
     if (useDefaultCsv.value) {
       content = generateDefaultCsv()
-      filename = `${key.value.name.replace(/\s+/g,'_')}_sample.csv.asc`
+      if (!destFilename.value) filename = `${key.value.name.replace(/\s+/g,'_')}_sample.csv`;
     } else if (uploadedFile.value) {
       // uploadedFile may be File or array depending on v-file-input; normalize
       const file = Array.isArray(uploadedFile.value) ? uploadedFile.value[0] : uploadedFile.value
       if (!file) throw new Error('No file selected')
       const text = await readFileAsText(file)
       content = text
-      filename = `${file.name}.asc`
+      // if user provided destFilename, use it; otherwise keep original file name
+      if (!destFilename.value) filename = file.name
     } else {
       alert('Please select a file or choose the default CSV option')
       return
     }
 
-    const encrypted = await encryptMessage(content, [key.value.publicKey])
-    // download
+    // ensure filename has extension
+    if (!filename.toLowerCase().endsWith(ext)) filename = filename + ext
+
+    const encrypted = await encryptMessage(content, [key.value.publicKey], format === 'binary' ? 'binary' : 'armored')
+
     const element = document.createElement('a')
-    const blob = new Blob([encrypted], { type: 'text/plain' })
+    let blob
+    if (format === 'binary') {
+      // encrypted is Uint8Array
+      blob = new Blob([encrypted], { type: 'application/octet-stream' })
+    } else {
+      blob = new Blob([encrypted], { type: 'text/plain' })
+    }
+
     element.href = URL.createObjectURL(blob)
     element.download = filename
     document.body.appendChild(element)
     element.click()
     document.body.removeChild(element)
-    alert('PGP file created and downloaded')
+    alert('Encrypted file created and downloaded')
   } catch (e) {
     console.error(e)
     alert('Failed to create PGP file: ' + (e.message || e))

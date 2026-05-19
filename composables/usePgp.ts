@@ -232,18 +232,22 @@ export const usePgp = () => {
         return allKeys;
     };
 
-    const encryptMessage = async (message: string, publicKeys: string[]) => {
+    const encryptMessage = async (message: string, publicKeys: string[], format: 'armored' | 'binary' = 'armored') => {
         loading.value = true;
         try {
             const encryptionKeys = await Promise.all(
                 publicKeys.map(k => openpgp.readKey({ armoredKey: k }))
             );
-            
+
+            const msg = await openpgp.createMessage({ text: message });
+
+            // openpgp.encrypt supports 'armored' (string) or 'binary' (Uint8Array)
             const encrypted = await openpgp.encrypt({
-                message: await openpgp.createMessage({ text: message }),
-                encryptionKeys
+                message: msg,
+                encryptionKeys,
+                format
             });
-            
+
             return encrypted;
         } finally {
             loading.value = false;
