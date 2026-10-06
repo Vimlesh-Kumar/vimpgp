@@ -141,8 +141,8 @@
           This permanently deletes <strong>{{ key.name }}</strong> from local storage.
         </p>
         <div class="d-flex ga-3">
-          <v-btn variant="tonal" block size="large" class="font-weight-bold" @click="showDeleteConfirm = false">Cancel</v-btn>
-          <v-btn color="error" block size="large" class="font-weight-bold" @click="handleDeleteConfirm">Confirm</v-btn>
+          <v-btn variant="tonal" size="large" class="flex-1-1-0 font-weight-bold" @click="showDeleteConfirm = false">Cancel</v-btn>
+          <v-btn color="error" size="large" class="flex-1-1-0 font-weight-bold" @click="handleDeleteConfirm">Confirm</v-btn>
         </div>
       </v-card>
     </v-dialog>
