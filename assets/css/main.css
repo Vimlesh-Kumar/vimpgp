@@ -1,256 +1,277 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
 @import url('@mdi/font/css/materialdesignicons.min.css');
 
-html,
-body {
-  font-family: 'Outfit', sans-serif !important;
-  background-color: rgb(var(--v-theme-background));
-  color: rgb(var(--v-theme-on-background));
+/* ============================================================
+   Design tokens
+   ============================================================ */
+:root {
+  --font-sans: 'Outfit', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Roboto Mono', monospace;
+
+  --radius-sm: 10px;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 26px;
+
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Override Vuetify application font and set responsive base */
-.v-application {
-  font-family: 'Outfit', sans-serif !important;
-  background: radial-gradient(
-    circle at 10% 20%,
-    rgba(var(--v-theme-primary), 0.12),
-    rgb(var(--v-theme-background)) 75%
-  ) !important;
-  min-height: 100vh;
-  font-size: 14px; /* Slightly smaller base font */
-}
-
-/* Responsive Typography Overrides */
-h1.text-h1, h1.text-h2, h1.text-h3 {
-  font-size: clamp(2rem, 5vw, 3.5rem) !important;
-  line-height: 1.1 !important;
-}
-
-h2.text-h4 {
-  font-size: clamp(1.5rem, 4vw, 2.2rem) !important;
-}
-
-h3.text-h5, h3.text-h6 {
-  font-size: clamp(1.2rem, 3vw, 1.5rem) !important;
-}
-
-.text-body-1 {
-  font-size: 0.95rem !important;
-}
-
-.text-body-2 {
-  font-size: 0.85rem !important;
-}
-
-/* Theme-aware glass variables */
+/* Theme-scoped surface + glass tokens */
 .v-theme--dark {
-  --logo-text: #ffffff;
-  --glass-bg: rgba(15, 15, 15, 0.4);
-  --glass-bg-strong: rgba(10, 10, 10, 0.85);
+  --logo-text: #f8fafc;
+  --hairline: rgba(255, 255, 255, 0.08);
+  --hairline-strong: rgba(255, 255, 255, 0.14);
+  --card-bg: rgba(255, 255, 255, 0.028);
+  --card-bg-hover: rgba(255, 255, 255, 0.05);
+  --glass-bg: rgba(18, 24, 33, 0.55);
+  --glass-bg-strong: rgba(12, 17, 24, 0.92);
   --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
-  --glass-shadow-soft: 0 4px 20px 0 rgba(0, 0, 0, 0.4);
+  --glass-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.8);
+  --glass-shadow-soft: 0 12px 32px -16px rgba(0, 0, 0, 0.6);
+  --inset-bg: rgba(0, 0, 0, 0.28);
+  --scroll-track: #0d1219;
+  --scroll-thumb: #2a3542;
+  --scroll-thumb-hover: #3a4757;
 }
 
 .v-theme--light {
-  --logo-text: #1a1a1a;
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-bg-strong: rgba(255, 255, 255, 0.98);
-  --glass-border: rgba(0, 0, 0, 0.08);
-  --glass-shadow: 0 8px 32px 0 rgba(25, 25, 25, 0.12);
-  --glass-shadow-soft: 0 4px 20px 0 rgba(25, 25, 25, 0.08);
+  --logo-text: #0f172a;
+  --hairline: rgba(15, 23, 42, 0.09);
+  --hairline-strong: rgba(15, 23, 42, 0.16);
+  --card-bg: rgba(255, 255, 255, 0.7);
+  --card-bg-hover: rgba(255, 255, 255, 0.95);
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-bg-strong: rgba(255, 255, 255, 0.97);
+  --glass-border: rgba(15, 23, 42, 0.08);
+  --glass-shadow: 0 20px 45px -22px rgba(15, 23, 42, 0.22);
+  --glass-shadow-soft: 0 10px 26px -16px rgba(15, 23, 42, 0.16);
+  --inset-bg: rgba(15, 23, 42, 0.04);
+  --scroll-track: #e2e8f0;
+  --scroll-thumb: #b6c2d1;
+  --scroll-thumb-hover: #94a3b8;
 }
 
-/* Glassmorphism Utility */
-.glass-effect {
-  background: var(--glass-bg) !important;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
+/* ============================================================
+   Base
+   ============================================================ */
+html,
+body {
+  font-family: var(--font-sans);
+  background-color: rgb(var(--v-theme-background));
+  color: rgb(var(--v-theme-on-background));
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* Typography Utilities */
-.tracking-tighter {
-  letter-spacing: -1.5px !important;
+.v-application {
+  font-family: var(--font-sans) !important;
+  min-height: 100vh;
+  font-size: 14.5px;
 }
 
-.tracking-wide {
-  letter-spacing: 1px !important;
+/* Ambient background mesh — one calm gradient field, no chaos */
+.app-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 55% at 12% 0%, rgba(var(--v-theme-primary), 0.14), transparent 60%),
+    radial-gradient(55% 50% at 100% 8%, rgba(var(--v-theme-secondary), 0.12), transparent 55%),
+    radial-gradient(40% 40% at 50% 100%, rgba(var(--v-theme-accent), 0.06), transparent 60%);
 }
 
-.tracking-widest {
-  letter-spacing: 3px !important;
+.v-theme--light .app-bg {
+  opacity: 0.8;
 }
 
-.uppercase {
-  text-transform: uppercase !important;
+/* ============================================================
+   Typography helpers
+   ============================================================ */
+h1, h2, h3, h4 { letter-spacing: -0.02em; }
+
+.text-h1, .text-h2, .text-h3 { line-height: 1.08 !important; }
+
+.font-mono { font-family: var(--font-mono) !important; letter-spacing: -0.01em; }
+
+.tracking-tighter { letter-spacing: -0.04em !important; }
+.tracking-tight { letter-spacing: -0.02em !important; }
+.tracking-wide { letter-spacing: 0.05em !important; }
+.tracking-widest { letter-spacing: 0.18em !important; }
+.uppercase { text-transform: uppercase !important; }
+
+.text-logo-white { color: var(--logo-text) !important; }
+
+.eyebrow {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgb(var(--v-theme-primary));
 }
 
-.font-mono {
-  font-family: 'Roboto Mono', monospace !important;
-}
-
-.v-tooltip > .v-overlay__content, 
-.v-tooltip .v-overlay__content,
-.v-tooltip__content {
-  background: rgba(0, 0, 0, 0.95) !important;
-  color: white !important;
-  font-size: 0.7rem !important;
-  font-weight: 800 !important;
-  letter-spacing: 0.8px !important;
-  text-transform: uppercase !important;
-  padding: 6px 12px !important;
-  border: 1px solid rgba(var(--v-theme-primary), 0.3) !important;
-  border-radius: 8px !important;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
-}
-
-.text-logo-white {
-  color: var(--logo-text) !important;
-}
-
-.scroll-mt-20 {
-  scroll-margin-top: 100px;
-}
-
-.glass-card {
-  background: var(--glass-bg) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
-}
-
-/* Gradient Text */
+/* Gradient text */
 .text-gradient {
-  background: linear-gradient(135deg, #00FFCC 0%, #B338FF 100%);
-  background-clip: text;
+  background: linear-gradient(120deg, rgb(var(--v-theme-primary)), rgb(var(--v-theme-secondary)));
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 .text-gradient-secondary {
-  background: linear-gradient(135deg, #FFD740 0%, #FF5252 100%);
-  background-clip: text;
+  background: linear-gradient(120deg, rgb(var(--v-theme-warning)), rgb(var(--v-theme-error)));
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
+/* ============================================================
+   Surfaces
+   ============================================================ */
+.surface-card,
+.glass-card {
+  background: var(--card-bg) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--hairline) !important;
+  box-shadow: var(--glass-shadow-soft);
+  border-radius: var(--radius-lg);
 }
 
-::-webkit-scrollbar-track {
-  background: #121212;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
-/* Glass Panel for Dropdowns */
-.glass-panel {
-  background: var(--glass-bg-strong) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+.glass-effect {
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border: 1px solid var(--glass-border);
+}
+
+/* Panels for menus / dropdowns / dialogs */
+.glass-panel,
+.v-overlay__content > .v-card,
+.v-overlay__content > .v-list {
+  background: var(--glass-bg-strong) !important;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--glass-border) !important;
   box-shadow: var(--glass-shadow);
 }
 
-/* Vuetify Menu Override */
-.v-overlay__content {
-  background: var(--glass-bg-strong) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+.glass-panel-btn {
+  background: var(--card-bg) !important;
+  border: 1px solid var(--hairline) !important;
 }
 
-.v-list {
-  background: transparent !important;
+.inset-box {
+  background: var(--inset-bg);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
 }
 
-/* Expansion Panels / FAQ */
-.faq-panels .v-expansion-panel {
-  background: var(--glass-bg) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow-soft);
+.hairline { border: 1px solid var(--hairline) !important; }
+.hairline-t { border-top: 1px solid var(--hairline) !important; }
+.hairline-b { border-bottom: 1px solid var(--hairline) !important; }
+
+.ring-primary {
+  border: 1px solid rgba(var(--v-theme-primary), 0.35) !important;
 }
 
-.faq-panels .v-expansion-panel-title {
-  color: #fff !important;
+/* ============================================================
+   Interactions & effects
+   ============================================================ */
+.lift {
+  transition: transform 0.28s var(--ease), box-shadow 0.28s var(--ease), border-color 0.28s var(--ease);
+  will-change: transform;
+}
+.lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--glass-shadow);
+  border-color: rgba(var(--v-theme-primary), 0.3) !important;
 }
 
-.faq-panels .v-expansion-panel-text {
-  background: rgba(var(--v-theme-background), 0.4) !important;
-}
+.shadow-glow { box-shadow: 0 8px 30px -8px rgba(var(--v-theme-primary), 0.45) !important; }
+.shadow-success { box-shadow: 0 8px 24px -10px rgba(var(--v-theme-success), 0.4) !important; }
 
-/* Table Styling */
-.glass-table {
-  background: var(--glass-bg) !important;
-  border: 1px solid var(--glass-border);
-  border-radius: 16px;
-  overflow: hidden;
-}
+.cursor-pointer { cursor: pointer; }
+.scroll-mt-20 { scroll-margin-top: 100px; }
+.sticky-top { position: sticky; top: 90px; }
 
-.glass-table thead {
-  background: rgba(var(--v-theme-primary), 0.08);
-}
-
-.glass-table tbody tr:not(:last-child) td {
-  border-bottom: 1px solid var(--glass-border) !important;
-}
-
-.cursor-pointer {
-  cursor: pointer;
-}
-
-.sticky-top {
-  position: sticky;
-  top: 100px;
-}
-
-.shadow-glow {
-  box-shadow: 0 0 15px rgba(0, 229, 255, 0.2) !important;
-}
-
-.shadow-success {
-  box-shadow: 0 0 10px rgba(76, 175, 80, 0.2) !important;
-}
-
+/* Status dot */
 .status-dot {
   width: 8px;
   height: 8px;
-  background-color: #4CAF50;
+  background-color: rgb(var(--v-theme-success));
   border-radius: 50%;
-  box-shadow: 0 0 10px #4CAF50;
-  animation: pulse 2s infinite;
+  box-shadow: 0 0 0 0 rgba(var(--v-theme-success), 0.6);
+  animation: pulse-dot 2.4s infinite;
 }
 
-@keyframes pulse {
-  0% {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  50% {
-    opacity: 0.5;
-    transform: scale(1.2);
-  }
-
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
+@keyframes pulse-dot {
+  0% { box-shadow: 0 0 0 0 rgba(var(--v-theme-success), 0.55); }
+  70% { box-shadow: 0 0 0 8px rgba(var(--v-theme-success), 0); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--v-theme-success), 0); }
 }
 
-.status-badge {
-  letter-spacing: 0.5px;
-  border: 1px solid rgba(76, 175, 80, 0.2) !important;
+.status-badge { letter-spacing: 0.05em; }
+
+/* ============================================================
+   Form fields (unified look)
+   ============================================================ */
+.v-field.v-field--variant-solo-filled {
+  background: var(--inset-bg) !important;
+  border: 1px solid var(--hairline);
+  transition: border-color 0.25s var(--ease), background 0.25s var(--ease);
+}
+.v-field.v-field--variant-solo-filled.v-field--focused {
+  border-color: rgba(var(--v-theme-primary), 0.55) !important;
+  background: var(--card-bg-hover) !important;
+}
+
+/* ============================================================
+   Tables
+   ============================================================ */
+.glass-table {
+  background: var(--card-bg) !important;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.glass-table thead th {
+  background: rgba(var(--v-theme-primary), 0.06);
+}
+
+/* ============================================================
+   Tooltip
+   ============================================================ */
+.v-tooltip > .v-overlay__content {
+  background: var(--glass-bg-strong) !important;
+  color: rgb(var(--v-theme-on-surface)) !important;
+  font-size: 0.7rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  padding: 6px 12px !important;
+  border: 1px solid rgba(var(--v-theme-primary), 0.35) !important;
+  border-radius: 8px !important;
+  box-shadow: var(--glass-shadow-soft) !important;
+  backdrop-filter: blur(12px);
+}
+
+/* ============================================================
+   Scrollbar
+   ============================================================ */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--scroll-track); }
+::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border-radius: 6px;
+  border: 2px solid var(--scroll-track);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
 }

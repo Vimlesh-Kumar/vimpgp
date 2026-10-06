@@ -1,88 +1,95 @@
 <template>
   <v-app class="app-container">
-    <v-app-bar flat class="glass-navbar border-b-1" height="64">
-      <v-container class="d-flex align-center py-0 px-2 px-sm-4" fluid>
-        <NuxtLink to="/" class="text-decoration-none d-flex align-center">
-          <v-avatar size="36" class="mr-2 mr-sm-3 shadow-glow" rounded="lg">
-            <v-img src="/logo.png" cover alt="VimPGP Logo"/>
+    <div class="app-bg" />
+
+    <v-app-bar flat class="glass-effect hairline-b" height="66">
+      <v-container class="d-flex align-center py-0 px-3 px-sm-4" fluid style="max-width: 1320px;">
+        <NuxtLink to="/" class="text-decoration-none d-flex align-center brand-link">
+          <v-avatar size="38" class="mr-3 brand-avatar" rounded="lg">
+            <v-img src="/logo.png" cover alt="VimPGP Logo" />
           </v-avatar>
-          <div class="d-none d-sm-flex flex-column justify-center mt-n1">
-            <span class="text-h6 font-weight-black text-logo-white tracking-tighter line-height-tight">VIM<span class="text-gradient">PGP</span></span>
-            <span class="text-caption text-primary font-weight-bold uppercase tracking-widest" style="font-size: 0.6rem !important; margin-top: -4px;">Secure Suite</span>
+          <div class="d-none d-sm-flex flex-column justify-center">
+            <span class="text-subtitle-1 font-weight-black text-logo-white tracking-tight line-height-tight">VIM<span class="text-gradient">PGP</span></span>
+            <span class="eyebrow" style="font-size: 0.58rem; margin-top: -2px;">Secure Suite</span>
           </div>
         </NuxtLink>
-      <v-divider vertical inset class="mx-6 d-none d-lg-block" style="opacity: 0.1"/>
 
-      <div class="d-none d-lg-flex align-center">
-        <v-chip size="small" variant="tonal" color="success" class="font-weight-black px-4 status-badge shadow-success">
-          <div class="status-dot mr-2"/>
-          CLIENT-SIDE SECURE
+        <v-chip
+          size="small"
+          variant="tonal"
+          color="success"
+          class="font-weight-bold ml-6 d-none d-lg-inline-flex status-badge"
+        >
+          <span class="status-dot mr-2" />
+          Client-side secure
         </v-chip>
-      </div>
 
-        <v-spacer/>
+        <v-spacer />
 
-      <div class="d-flex align-center">
-        <v-tabs v-model="activeTab" bg-color="transparent" color="primary" density="compact" hide-slider class="nav-tabs d-none d-sm-flex">
-          <v-tab to="/" value="dashboard" rounded="lg" class="px-3 text-none font-weight-bold">
-            <v-icon start size="16" class="mr-1">mdi-view-dashboard</v-icon>
-            Dashboard
+        <v-tabs
+          v-model="activeTab"
+          bg-color="transparent"
+          color="primary"
+          density="comfortable"
+          hide-slider
+          class="nav-tabs d-none d-md-flex mr-2"
+        >
+          <v-tab v-for="item in navItems" :key="item.to" :to="item.to" :value="item.to" class="px-4 text-none font-weight-bold rounded-lg">
+            <v-icon v-if="item.icon" start size="18">{{ item.icon }}</v-icon>
+            {{ item.label }}
           </v-tab>
-          <v-tab to="/secure" value="secure" rounded="lg" class="px-3 text-none font-weight-bold">
-            <v-icon start size="16" class="mr-1">mdi-shield-lock</v-icon>
-            Secure
-          </v-tab>
-          <v-tab to="/generate" value="generate" rounded="lg" class="px-3 text-none font-weight-bold">
-            <v-icon start size="16" class="mr-1">mdi-key-plus</v-icon>
-            Generate
-          </v-tab>
-          <v-tab to="/faq" value="faq" rounded="lg" class="px-3 text-none font-weight-bold">FAQ</v-tab>
-          <v-tab to="/about" value="about" rounded="lg" class="px-3 text-none font-weight-bold">About</v-tab>
         </v-tabs>
-
-        <v-divider vertical inset class="mx-3 d-none d-sm-block" style="opacity: 0.1"/>
 
         <v-btn
           icon
-          variant="tonal"
-          size="32"
-          class="glass-panel-btn border-1 mr-2"
+          variant="text"
+          size="small"
+          class="glass-panel-btn mr-2"
           :title="`Theme: ${themeLabel}`"
+          :aria-label="`Switch theme, currently ${themeLabel}`"
           @click="toggleTheme"
         >
-          <v-icon size="16">{{ themeIcon }}</v-icon>
+          <v-icon size="20">{{ themeIcon }}</v-icon>
         </v-btn>
 
         <v-btn
-           icon
-           variant="tonal"
-           size="32"
-           href="https://github.com/Vimlesh-Kumar/vimpgp"
-           target="_blank"
-           title="View on GitHub"
-           class="glass-panel-btn border-1"
+          icon
+          variant="text"
+          size="small"
+          href="https://github.com/Vimlesh-Kumar/vimpgp"
+          target="_blank"
+          rel="noopener"
+          title="View on GitHub"
+          aria-label="View source on GitHub"
+          class="glass-panel-btn"
         >
-          <v-icon size="18">mdi-github</v-icon>
+          <v-icon size="20">mdi-github</v-icon>
         </v-btn>
-      </div>
-    </v-container>
+
+        <v-menu location="bottom end">
+          <template #activator="{ props }">
+            <v-btn icon variant="text" size="small" class="glass-panel-btn ml-2 d-md-none" aria-label="Open navigation menu" v-bind="props">
+              <v-icon size="22">mdi-menu</v-icon>
+            </v-btn>
+          </template>
+          <v-list class="glass-panel" density="comfortable" min-width="200" rounded="lg">
+            <v-list-item v-for="item in navItems" :key="item.to" :to="item.to" :prepend-icon="item.icon" :title="item.label" />
+          </v-list>
+        </v-menu>
+      </v-container>
     </v-app-bar>
 
     <v-main>
-      <div class="background-blobs">
-        <div class="blob blob-1"/>
-        <div class="blob blob-2"/>
-         <div class="blob blob-3"/>
-      </div>
-      <v-container class="align-start pt-10" style="max-width: 1300px; position: relative; z-index: 1;">
+      <v-container class="align-start pt-8 pb-16" style="max-width: 1320px; position: relative; z-index: 1;">
         <slot />
       </v-container>
     </v-main>
-    
-    <v-footer class="glass-effect d-flex justify-center py-4 bg-transparent">
-       <span class="text-caption text-medium-emphasis">
-         🔒 100% Client-Side Encryption. Your keys never leave your browser.
-       </span>
+
+    <v-footer class="glass-effect hairline-t d-flex justify-center py-4 bg-transparent">
+      <span class="text-caption text-medium-emphasis d-flex align-center ga-2">
+        <v-icon size="14" color="success">mdi-shield-check</v-icon>
+        100% client-side encryption · your keys never leave your browser
+      </span>
     </v-footer>
   </v-app>
 </template>
@@ -90,12 +97,21 @@
 <script setup>
 import { ref, onBeforeUnmount, onMounted, computed, watch } from 'vue'
 import { useTheme } from 'vuetify'
+
 const activeTab = ref(null)
 const theme = useTheme()
 const themeMode = ref('dark')
 const systemDark = ref(false)
 let mediaQuery = null
 let mediaHandler = null
+
+const navItems = [
+  { to: '/', label: 'Dashboard', icon: 'mdi-view-dashboard-outline' },
+  { to: '/secure', label: 'Secure', icon: 'mdi-shield-lock-outline' },
+  { to: '/generate', label: 'Generate', icon: 'mdi-key-plus' },
+  { to: '/faq', label: 'FAQ', icon: 'mdi-help-circle-outline' },
+  { to: '/about', label: 'About', icon: 'mdi-information-outline' },
+]
 
 const themeIcon = computed(() => {
   if (themeMode.value === 'system') return 'mdi-laptop'
@@ -111,7 +127,7 @@ const applyTheme = () => {
   const resolved = themeMode.value === 'system'
     ? (systemDark.value ? 'dark' : 'light')
     : themeMode.value
-  theme.global.name.value = resolved
+  theme.change(resolved)
 }
 
 const toggleTheme = () => {
@@ -150,108 +166,28 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.header-border {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-}
-
-.hover-scale {
-  transition: transform 0.2s ease-in-out;
-}
-.hover-scale:hover {
-  transform: scale(1.02);
-}
-
-.border-primary {
-  border: 1px solid rgba(0, 229, 255, 0.3) !important;
-}
-
-.tracking-tighter {
-  letter-spacing: -1px;
-}
-.tracking-widest {
-  letter-spacing: 2px;
-}
-.uppercase {
-  text-transform: uppercase;
-}
-
-.glass-panel-btn {
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-
-.nav-tabs :deep(.v-tab) {
-  min-width: 100px;
-  transition: all 0.2s ease;
-  opacity: 0.7;
-}
-
-.nav-tabs :deep(.v-tab--selected) {
-  background: rgba(var(--v-theme-primary), 0.1);
-  opacity: 1;
-}
-
 .app-container {
   background: transparent !important;
 }
 
-.tracking-wide {
-  letter-spacing: 0.5px;
+.line-height-tight { line-height: 1.15; }
+
+.brand-link { transition: opacity 0.2s ease; }
+.brand-link:hover { opacity: 0.85; }
+
+.brand-avatar {
+  border: 1px solid var(--hairline-strong);
+  box-shadow: 0 4px 14px -6px rgba(var(--v-theme-primary), 0.5);
 }
 
-/* Background Animations */
-.background-blobs {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  z-index: 0;
-  pointer-events: none;
+.nav-tabs :deep(.v-tab) {
+  min-width: 0;
+  opacity: 0.72;
+  transition: opacity 0.2s ease, background 0.2s ease;
 }
-
-.blob {
-  position: absolute;
-  filter: blur(120px);
-  opacity: 0.15;
-  border-radius: 50%;
-  animation: float 20s infinite ease-in-out;
-}
-
-.blob-1 {
-  background: #B338FF;
-  width: 400px;
-  height: 400px;
-  top: -100px;
-  left: -100px;
-  animation-delay: 0s;
-}
-
-.blob-2 {
-  background: #00FFCC;
-  width: 300px;
-  height: 300px;
-  bottom: 0;
-  right: -50px;
-  animation-delay: -5s;
-}
-
-.blob-3 {
-  background: #FF007F;
-  width: 250px;
-  height: 250px;
-  top: 40%;
-  left: 30%;
-  animation-duration: 25s;
-  animation-delay: -10s;
-  opacity: 0.2;
-}
-
-@keyframes float {
-  0% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -50px) scale(1.1); }
-  66% { transform: translate(-20px, 20px) scale(0.9); }
-  100% { transform: translate(0, 0) scale(1); }
+.nav-tabs :deep(.v-tab:hover) { opacity: 1; }
+.nav-tabs :deep(.v-tab--selected) {
+  opacity: 1;
+  background: rgba(var(--v-theme-primary), 0.12);
 }
 </style>

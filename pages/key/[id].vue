@@ -1,250 +1,211 @@
 <template>
-  <div v-if="key" class="py-6">
-    <div class="mb-8">
-      <v-btn variant="tonal" prepend-icon="mdi-arrow-left" to="/" color="primary" class="rounded-lg font-weight-bold">Back to Dashboard</v-btn>
+  <div v-if="key">
+    <div class="mb-6">
+      <v-btn variant="tonal" prepend-icon="mdi-arrow-left" to="/" color="primary" class="font-weight-bold">Back to dashboard</v-btn>
     </div>
 
-    <v-card class="glass-card pa-8 mb-8 rounded-xl border-primary shadow-glow overflow-hidden position-relative">
-       <div class="bg-glow"/>
-       <div class="d-flex flex-column flex-md-row justify-space-between align-start gap-6 position-relative" style="z-index: 1;">
-         <div class="d-flex align-center">
-            <v-avatar color="primary" variant="tonal" size="80" class="mr-6 rounded-xl border-primary shadow-glow">
-              <span class="text-h3 font-weight-black">{{ key.name.charAt(0).toUpperCase() }}</span>
-            </v-avatar>
-            <div>
-               <div class="d-flex align-center flex-wrap gap-3 mb-2">
-                 <h1 class="text-h3 font-weight-black text-white tracking-tighter">{{ key.name }}</h1>
-                 <v-chip color="primary" variant="flat" size="small" class="font-weight-black text-uppercase">{{ key.type }}</v-chip>
-               </div>
-               <div class="text-h6 text-medium-emphasis mb-4">{{ key.email }}</div>
-               
-               <div class="d-flex align-center px-4 py-2 rounded-lg bg-black-alpha-40 border-1 text-caption font-mono text-primary w-fit">
-                  <v-icon size="small" class="mr-2">mdi-fingerprint</v-icon>
-                  {{ key.fingerprint }}
-               </div>
+    <!-- Identity header -->
+    <v-card class="surface-card pa-6 pa-md-8 mb-8 overflow-hidden position-relative">
+      <div class="header-glow" />
+      <div class="d-flex flex-column flex-md-row justify-space-between align-md-center ga-6 position-relative" style="z-index: 1;">
+        <div class="d-flex align-center">
+          <v-avatar color="primary" variant="tonal" size="72" rounded="lg" class="mr-5">
+            <span class="text-h4 font-weight-black">{{ (key.name || '?').charAt(0).toUpperCase() }}</span>
+          </v-avatar>
+          <div class="overflow-hidden">
+            <div class="d-flex align-center flex-wrap ga-3 mb-1">
+              <h1 class="text-h5 text-md-h4 font-weight-black tracking-tighter text-truncate">{{ key.name }}</h1>
+              <v-chip color="primary" variant="tonal" size="small" class="font-weight-bold uppercase">{{ key.type }}</v-chip>
             </div>
-         </div>
-         
-         <div class="d-flex flex-column flex-sm-row gap-3 w-100 w-md-auto mt-4 mt-md-0">
-            <v-btn color="primary" variant="elevated" prepend-icon="mdi-download" height="50" class="rounded-xl px-6 font-weight-black shadow-glow" @click="download(key.publicKey, `${key.name}_public.asc`)">Export Public</v-btn>
-            <v-btn color="secondary" variant="tonal" prepend-icon="mdi-shield-key" height="50" class="rounded-xl px-6 font-weight-black" @click="download(key.privateKey, `${key.name}_private.asc`)">Export Private</v-btn>
-         </div>
-       </div>
-    </v-card>
-    
-    <v-row>
-      <v-col cols="12" lg="8">
-        <v-card class="glass-card pa-8 rounded-xl border-1 overflow-hidden">
-          <div class="d-flex align-center justify-space-between mb-8">
-            <h3 class="text-h5 font-weight-black uppercase tracking-widest text-primary">Cryptographic Subkeys</h3>
-            <v-dialog v-model="showAddSubkey" max-width="550">
-                <template #activator="{ props }">
-                  <v-btn v-bind="props" color="primary" variant="tonal" prepend-icon="mdi-plus" class="rounded-lg font-weight-black">Add Subkey</v-btn>
-                </template>
-                <v-card class="glass-card pa-6 rounded-xl border-1 overflow-visible">
-                  <h3 class="text-h5 font-weight-black mb-1">New Identity Subkey</h3>
-                  <p class="text-caption text-disabled mb-8 uppercase tracking-widest">Expand your key capability</p>
-                  
-                  <v-row>
-                    <v-col cols="12" sm="6">
-                      <v-select
-                        v-model="subkeyForm.type"
-                        label="Usage Type"
-                        :items="[{title: 'Signing Key', value: 'sign'}, {title: 'Encryption Key', value: 'encrypt'}, {title: 'Authentication Key', value: 'auth'}]"
-                        variant="solo-filled"
-                        class="custom-input"
-                        rounded="lg"
-                        menu-props="{ contentClass: 'glass-panel' }"
-                      />
-                    </v-col>
-                    <v-col cols="12" sm="6">
-                      <v-select
-                        v-model="subkeyForm.algo"
-                        label="Algorithm"
-                        :items="[{title: 'ECC', value: 'ecc'}, {title: 'RSA', value: 'rsa'}]"
-                        variant="solo-filled"
-                        class="custom-input"
-                        rounded="lg"
-                        menu-props="{ contentClass: 'glass-panel' }"
-                      />
-                    </v-col>
-                    <v-col cols="12">
-                      <v-select
-                        v-if="subkeyForm.algo === 'ecc'"
-                        v-model="subkeyForm.size"
-                        label="Elliptic Curve"
-                        :items="[{title: 'Curve25519', value: 25519}, {title: 'NIST P-256', value: 256}]"
-                        variant="solo-filled"
-                        class="custom-input"
-                        rounded="lg"
-                      />
-                      <v-select
-                        v-if="subkeyForm.algo === 'rsa'"
-                        v-model="subkeyForm.size"
-                        label="RSA Modulus"
-                        :items="[{title: '2048 bits', value: 2048}, {title: '4096 bits', value: 4096}]"
-                        variant="solo-filled"
-                        class="custom-input"
-                        rounded="lg"
-                      />
-                    </v-col>
-                    <v-col cols="12">
-                      <v-text-field
-                        v-model="subkeyForm.passphrase"
-                        label="Main Key Passphrase"
-                        type="password"
-                        variant="solo-filled"
-                        class="custom-input"
-                        rounded="lg"
-                        persistent-hint
-                        hint="Required to authenticate subkey addition"
-                      />
-                    </v-col>
-                  </v-row>
-                  
-                  <div class="d-flex justify-end gap-3 mt-8">
-                    <v-btn variant="text" @click="showAddSubkey = false">Cancel</v-btn>
-                    <v-btn color="primary" class="font-weight-black rounded-lg px-8" height="48" :loading="subkeyLoading" @click="handleAddSubkey">Generate Subkey</v-btn>
-                  </div>
-                </v-card>
-              </v-dialog>
+            <div class="text-body-2 text-medium-emphasis mb-3">{{ key.email || 'No email' }}</div>
+            <div class="inset-box d-inline-flex align-center pa-2 px-3 font-mono text-caption text-primary">
+              <v-icon size="15" class="mr-2">mdi-fingerprint</v-icon>{{ key.fingerprint }}
+            </div>
           </div>
-          
-          <v-table class="bg-transparent custom-table">
+        </div>
+
+        <div class="d-flex flex-column flex-sm-row ga-3">
+          <v-btn color="primary" prepend-icon="mdi-download" class="font-weight-bold shadow-glow" @click="download(key.publicKey, `${key.name}_public.asc`)">Export public</v-btn>
+          <v-btn v-if="key.privateKey" color="secondary" variant="tonal" prepend-icon="mdi-shield-key" class="font-weight-bold" @click="download(key.privateKey, `${key.name}_private.asc`)">Export private</v-btn>
+        </div>
+      </div>
+    </v-card>
+
+    <v-row>
+      <!-- Subkeys -->
+      <v-col cols="12" lg="8">
+        <v-card class="surface-card pa-5 pa-sm-7">
+          <div class="d-flex align-center justify-space-between flex-wrap ga-3 mb-5">
+            <h2 class="text-h6 font-weight-black">Cryptographic components</h2>
+            <v-btn v-if="key.privateKey" color="primary" variant="tonal" prepend-icon="mdi-plus" class="font-weight-bold" @click="showAddSubkey = true">Add subkey</v-btn>
+          </div>
+
+          <v-table class="bg-transparent">
             <thead>
               <tr>
-                <th id="th-id" scope="col" class="text-left font-weight-black grey-text uppercase">Identity ID</th>
-                <th id="th-purpose" scope="col" class="text-left font-weight-black grey-text uppercase">Purpose</th>
-                <th id="th-cipher" scope="col" class="text-left font-weight-black grey-text uppercase">Cipher</th>
-                <th id="th-created" scope="col" class="text-left font-weight-black grey-text uppercase">Created</th>
-                <th id="th-status" scope="col" class="text-left font-weight-black grey-text uppercase">Status</th>
+                <th scope="col" class="eyebrow">Key ID</th>
+                <th scope="col" class="eyebrow">Purpose</th>
+                <th scope="col" class="eyebrow">Cipher</th>
+                <th scope="col" class="eyebrow">Created</th>
+                <th scope="col" class="eyebrow">Status</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="subkey in subkeys" :key="subkey.id" class="table-row">
-                 <td class="font-mono text-caption text-primary font-weight-bold">
-                    #{{ subkey.id ? subkey.id.substring(8) : 'PENDING' }}
-                 </td>
-                 <td>
-                    <div class="d-flex align-center">
-                        <v-icon v-if="subkey.isPrimary || subkey.type ==='certify' || subkey.type === 'sign'" icon="mdi-shield-account" size="small" color="primary" class="mr-2"/>
-                        <v-icon v-else-if="subkey.type === 'encrypt'" icon="mdi-shield-lock" size="small" color="secondary" class="mr-2"/>
-                        <v-icon v-else icon="mdi-shield-check" size="small" color="info" class="mr-2"/>
-                        <span class="text-capitalize font-weight-bold">{{ subkey.type || 'System' }}</span>
-                    </div>
-                 </td>
-                 <td class="text-caption font-weight-medium">{{ subkey.algo }} / {{ subkey.curve || subkey.bits + 'b' }}</td>
-                 <td class="text-caption">{{ new Date(subkey.created).toLocaleDateString() }}</td>
-                 <td>
-                    <v-chip size="x-small" :color="subkey.isPrimary ? 'primary' : 'success'" variant="tonal" class="font-weight-black">
-                      {{ subkey.isPrimary ? 'PRIMARY' : 'ACTIVE' }}
-                    </v-chip>
-                 </td>
+              <tr v-for="sub in subkeys" :key="sub.id">
+                <td class="font-mono text-caption text-primary font-weight-bold">#{{ shortId(sub.id) }}</td>
+                <td>
+                  <div class="d-flex align-center ga-2">
+                    <v-icon :icon="purposeIcon(sub)" size="18" :color="purposeColor(sub)" />
+                    <span class="text-capitalize font-weight-bold">{{ purposeLabel(sub) }}</span>
+                  </div>
+                </td>
+                <td class="text-caption font-weight-medium">{{ cipherLabel(sub) }}</td>
+                <td class="text-caption">{{ formatDate(sub.created) }}</td>
+                <td>
+                  <v-chip size="x-small" :color="sub.expiry && new Date(sub.expiry) < new Date() ? 'error' : (sub.isPrimary ? 'primary' : 'success')" variant="tonal" class="font-weight-bold">
+                    {{ statusLabel(sub) }}
+                  </v-chip>
+                </td>
               </tr>
             </tbody>
           </v-table>
         </v-card>
       </v-col>
-      
+
+      <!-- File encryption + danger zone -->
       <v-col cols="12" lg="4">
-          <v-card class="glass-card pa-8 rounded-xl border-1 mb-6">
-            <h3 class="text-h6 font-weight-black uppercase tracking-widest text-primary mb-4">Create PGP File</h3>
-            <p class="text-caption text-disabled mb-4">Upload a file or generate a default CSV (100 rows × 10 columns) and encrypt it with this key.</p>
+        <v-card class="surface-card pa-5 pa-sm-7 mb-6">
+          <h2 class="text-subtitle-1 font-weight-black mb-1">Create PGP file</h2>
+          <p class="text-body-2 text-medium-emphasis mb-5">Upload a file or use a sample CSV (100 rows × 10 columns) and encrypt it to this key.</p>
 
-            <v-file-input
-              v-model="uploadedFile"
-              label="Choose file to encrypt"
-              variant="solo-filled"
-              show-size
-              hide-details
-              class="mb-4"
-            />
+          <v-file-input v-model="uploadedFile" label="File to encrypt" show-size class="mb-3" />
+          <v-text-field v-model="destFilename" label="Destination filename (optional)" placeholder="myfile.asc or backup.gpg" class="mb-3" />
+          <v-select v-model="selectedFormat" label="Output format" :items="formatItems" />
+          <v-checkbox v-model="useDefaultCsv" label="Use sample CSV instead" hide-details class="mb-4" />
 
-            <v-text-field
-              v-model="destFilename"
-              label="Destination filename (optional)"
-              placeholder="myfile.asc or backup.gpg"
-              variant="solo-filled"
-              class="mb-3"
-            />
+          <div class="d-flex flex-wrap ga-3">
+            <v-btn color="primary" class="font-weight-bold" prepend-icon="mdi-lock" :loading="creatingFile" @click="handleCreatePgpFile">Create &amp; encrypt</v-btn>
+            <v-btn variant="tonal" @click="generatePreviewCsv">Preview CSV</v-btn>
+          </div>
+        </v-card>
 
-            <v-select
-              v-model="selectedFormat"
-              :items="[{ title: 'PGP (ASCII armored .asc)', value: 'pgp' }, { title: 'GPG (binary .gpg)', value: 'gpg' } ]"
-              item-title="title"
-              item-value="value"
-              label="Output Format"
-              variant="solo-filled"
-              class="mb-3"
-            />
-
-            <v-checkbox v-model="useDefaultCsv" label="Use default sample CSV instead" class="mb-4" />
-
-            <div class="d-flex gap-3">
-              <v-btn color="primary" :loading="creatingFile" @click="handleCreatePgpFile" class="font-weight-black">Create & Encrypt</v-btn>
-              <v-btn variant="tonal" @click="generatePreviewCsv">Preview CSV</v-btn>
-            </div>
-          </v-card>
-
-          <v-card class="glass-card pa-8 rounded-xl border-1 h-100 bg-black-alpha-20 border-error-muted">
-           <div class="d-flex align-center mb-6 text-error">
-             <v-icon class="mr-3">mdi-alert-octagon</v-icon>
-             <h3 class="text-h6 font-weight-black uppercase tracking-wider">Danger Zone</h3>
-           </div>
-           
-           <p class="text-body-2 text-disabled mb-8 line-height-relaxed">
-             Deleting this key pair is irreversible. All messages encrypted with this key will become <strong>permanently inaccessible</strong> unless you have an external backup of the private key.
-           </p>
-           
-           <v-dialog v-model="showDeleteConfirm" max-width="450">
-               <template #activator="{ props }">
-                    <v-btn v-bind="props" color="error" block variant="tonal" height="54" class="rounded-xl font-weight-black" prepend-icon="mdi-delete-forever">Destroy Key Pair</v-btn>
-               </template>
-               <v-card class="glass-card pa-8 rounded-xl border-1">
-                   <div class="text-center mb-6">
-                     <v-avatar color="error" variant="tonal" size="70" class="mb-4">
-                       <v-icon size="40">mdi-delete-alert</v-icon>
-                     </v-avatar>
-                     <h2 class="text-h4 font-weight-black text-white">Security Wipe?</h2>
-                   </div>
-                   <v-card-text class="text-center text-medium-emphasis">
-                       This will permanently delete <strong>{{ key.name }}</strong> from local storage. Are you absolutely certain?
-                   </v-card-text>
-                   <v-card-actions class="mt-8 gap-3">
-                       <v-btn variant="tonal" block size="large" class="rounded-lg font-weight-bold" @click="showDeleteConfirm = false">Abandon</v-btn>
-                       <v-btn color="error" variant="flat" block size="large" class="rounded-lg font-weight-black" @click="handleDeleteConfirm">Confirm Wipe</v-btn>
-                   </v-card-actions>
-               </v-card>
-           </v-dialog>
+        <v-card class="surface-card pa-5 pa-sm-7 danger-zone">
+          <div class="d-flex align-center ga-2 mb-4 text-error">
+            <v-icon>mdi-alert-octagon-outline</v-icon>
+            <h2 class="text-subtitle-1 font-weight-black uppercase tracking-wide">Danger zone</h2>
+          </div>
+          <p class="text-body-2 text-medium-emphasis mb-6">
+            Deleting this key pair is irreversible. Messages encrypted to it become <strong>permanently unreadable</strong> unless you kept an external backup.
+          </p>
+          <v-btn color="error" block variant="tonal" size="large" class="font-weight-bold" prepend-icon="mdi-delete-forever" @click="showDeleteConfirm = true">Destroy key pair</v-btn>
         </v-card>
       </v-col>
     </v-row>
+
+    <!-- Add subkey dialog -->
+    <v-dialog v-model="showAddSubkey" max-width="560">
+      <v-card class="glass-panel pa-6">
+        <h3 class="text-h6 font-weight-black mb-1">New subkey</h3>
+        <p class="text-caption text-medium-emphasis mb-5">Bind an additional signing or encryption key to this identity.</p>
+        <v-row>
+          <v-col cols="12" sm="6">
+            <v-select v-model="subkeyForm.type" label="Purpose" :items="typeItems" />
+          </v-col>
+          <v-col cols="12" sm="6">
+            <v-select v-model="subkeyForm.algo" label="Algorithm" :items="algoItems" />
+          </v-col>
+          <v-col cols="12" sm="6">
+            <v-select v-if="subkeyForm.algo === 'ecc'" v-model="subkeyForm.size" label="Curve" :items="curveItems" />
+            <v-select v-else v-model="subkeyForm.size" label="Length" :items="rsaItems" />
+          </v-col>
+          <v-col cols="12" sm="6">
+            <v-select v-model="subkeyForm.expiry" label="Expiry" :items="expiryItems" />
+          </v-col>
+          <v-col cols="12">
+            <v-text-field v-model="subkeyForm.passphrase" label="Master passphrase" type="password" prepend-inner-icon="mdi-key-variant" hint="Required to unlock a passphrase-protected key" persistent-hint />
+          </v-col>
+        </v-row>
+        <div class="d-flex justify-end ga-3 mt-6">
+          <v-btn variant="text" @click="showAddSubkey = false">Cancel</v-btn>
+          <v-btn color="primary" class="font-weight-bold px-6" :loading="subkeyLoading" @click="handleAddSubkey">Generate subkey</v-btn>
+        </div>
+      </v-card>
+    </v-dialog>
+
+    <!-- Delete dialog -->
+    <v-dialog v-model="showDeleteConfirm" max-width="440">
+      <v-card class="glass-panel pa-7 text-center">
+        <v-avatar color="error" variant="tonal" size="64" class="mb-4"><v-icon size="34">mdi-delete-alert</v-icon></v-avatar>
+        <h3 class="text-h5 font-weight-black mb-2">Destroy this key?</h3>
+        <p class="text-body-2 text-medium-emphasis mb-6">
+          This permanently deletes <strong>{{ key.name }}</strong> from local storage.
+        </p>
+        <div class="d-flex ga-3">
+          <v-btn variant="tonal" block size="large" class="font-weight-bold" @click="showDeleteConfirm = false">Cancel</v-btn>
+          <v-btn color="error" block size="large" class="font-weight-bold" @click="handleDeleteConfirm">Confirm</v-btn>
+        </div>
+      </v-card>
+    </v-dialog>
+
+    <v-snackbar v-model="snackbar" :color="snackbarColor" location="bottom right" rounded="lg">{{ snackbarText }}</v-snackbar>
   </div>
-  <div v-else class="py-12 text-center">
-    <v-progress-circular indeterminate color="primary"/>
-    <div class="mt-4">Loading or Key not found...</div>
+
+  <div v-else class="py-16 text-center">
+    <v-progress-circular indeterminate color="primary" />
+    <div class="mt-4 text-medium-emphasis">Loading key…</div>
   </div>
 </template>
 
 <script setup>
 import { computed, ref, onMounted, reactive, watch } from 'vue'
+
 const route = useRoute()
 const router = useRouter()
 const { keys, deleteKey, initKeys, getKeyDetails, generateSubkey, encryptMessage } = usePgp()
 
 const subkeys = ref([])
-
 const showAddSubkey = ref(false)
 const showDeleteConfirm = ref(false)
-const subkeyForm = reactive({
-    type: 'sign',
-    algo: 'ecc',
-    size: 25519,
-    expiry: 0,
-    passphrase: ''
-})
-
 const subkeyLoading = ref(false)
+const snackbar = ref(false)
+const snackbarText = ref('')
+const snackbarColor = ref('success')
+
+const subkeyForm = reactive({ type: 'sign', algo: 'ecc', size: 25519, expiry: 0, passphrase: '' })
+
+const typeItems = [
+  { title: 'Signing key', value: 'sign' },
+  { title: 'Encryption key', value: 'encrypt' },
+]
+const algoItems = [
+  { title: 'ECC', value: 'ecc' },
+  { title: 'RSA', value: 'rsa' },
+]
+const curveItems = [
+  { title: 'Curve25519', value: 25519 },
+  { title: 'NIST P-256', value: 256 },
+  { title: 'NIST P-384', value: 384 },
+]
+const rsaItems = [
+  { title: '2048 bits', value: 2048 },
+  { title: '4096 bits', value: 4096 },
+]
+const formatItems = [
+  { title: 'PGP (ASCII armored .asc)', value: 'pgp' },
+  { title: 'GPG (binary .gpg)', value: 'gpg' },
+]
+const expiryItems = [
+  { title: 'Never', value: 0 },
+  { title: '1 year', value: 31536000 },
+  { title: '2 years', value: 63072000 },
+  { title: '5 years', value: 157680000 },
+]
+
+const key = computed(() => keys.value?.find(k => k.id === route.params.id) ?? null)
+
+const refreshSubkeys = async () => {
+  if (key.value) subkeys.value = await getKeyDetails(key.value.privateKey || key.value.publicKey)
+}
 
 const uploadedFile = ref(null)
 const useDefaultCsv = ref(false)
@@ -300,7 +261,7 @@ const handleCreatePgpFile = async () => {
       // if user provided destFilename, use it; otherwise keep original file name
       if (!destFilename.value) filename = file.name
     } else {
-      alert('Please select a file or choose the default CSV option')
+      notify('Select a file or choose the sample CSV option', 'error')
       return
     }
 
@@ -323,10 +284,10 @@ const handleCreatePgpFile = async () => {
     document.body.appendChild(element)
     element.click()
     document.body.removeChild(element)
-    alert('Encrypted file created and downloaded')
+    notify('Encrypted file created and downloaded')
   } catch (e) {
     console.error(e)
-    alert('Failed to create PGP file: ' + (e.message || e))
+    notify('Failed to create PGP file: ' + (e.message || e), 'error')
   } finally {
     creatingFile.value = false
   }
@@ -337,122 +298,82 @@ onMounted(async () => {
   await refreshSubkeys()
 })
 
-const key = computed(() => {
-  if (!keys.value) return null
-  return keys.value.find(k => k.id === route.params.id)
-})
+watch(key, async (newKey) => { if (newKey) await refreshSubkeys() })
+watch(() => subkeyForm.algo, (algo) => { subkeyForm.size = algo === 'ecc' ? 25519 : 4096 })
 
-const refreshSubkeys = async () => {
-    if (key.value) {
-        subkeys.value = await getKeyDetails(key.value.privateKey)
-    }
+const shortId = id => (id?.length > 8 ? id.slice(-8) : id).toUpperCase()
+const formatDate = iso => new Date(iso).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' })
+
+const purposeLabel = sub => (sub.isPrimary ? 'Certify' : sub.type)
+const purposeIcon = sub => (sub.isPrimary || sub.type === 'sign' ? 'mdi-shield-account' : 'mdi-shield-lock')
+const purposeColor = sub => (sub.isPrimary || sub.type === 'sign' ? 'primary' : 'secondary')
+
+const cipherLabel = (sub) => {
+  const algo = (sub.algo || '').toUpperCase()
+  if (sub.curve) return `${algo} · ${sub.curve}`
+  if (sub.bits) return `${algo} · ${sub.bits}-bit`
+  return algo || '—'
 }
 
-watch(key, async (newKey) => {
-    if (newKey) await refreshSubkeys()
-})
+const statusLabel = (sub) => {
+  if (sub.expiry && new Date(sub.expiry) < new Date()) return 'Expired'
+  return sub.isPrimary ? 'Primary' : 'Active'
+}
 
-watch(() => subkeyForm.algo, (newAlgo) => {
-  if (newAlgo === 'ecc') subkeyForm.size = 25519
-  else subkeyForm.size = 4096
-})
+const notify = (text, color = 'success') => {
+  snackbarText.value = text
+  snackbarColor.value = color
+  snackbar.value = true
+}
 
 const download = (content, filename) => {
-  const element = document.createElement('a');
-  const file = new Blob([content], {type: 'text/plain'});
-  element.href = URL.createObjectURL(file);
-  element.download = filename;
-  document.body.appendChild(element);
-  element.click();
-  document.body.removeChild(element);
+  const el = document.createElement('a')
+  el.href = URL.createObjectURL(new Blob([content], { type: 'text/plain' }))
+  el.download = filename
+  document.body.appendChild(el)
+  el.click()
+  document.body.removeChild(el)
+  URL.revokeObjectURL(el.href)
 }
 
 const handleDeleteConfirm = () => {
-    deleteKey(key.value.id)
-    showDeleteConfirm.value = false
-    router.push('/')
+  deleteKey(key.value.id)
+  showDeleteConfirm.value = false
+  router.push('/')
 }
 
 const handleAddSubkey = async () => {
-    subkeyLoading.value = true;
-    try {
-        await generateSubkey(key.value.id, subkeyForm.passphrase, subkeyForm.type, subkeyForm.algo, subkeyForm.size, subkeyForm.expiry)
-        showAddSubkey.value = false
-        subkeyForm.passphrase = '' // clear sensitive data
-        await refreshSubkeys() // Refresh list
-    } catch (e) {
-        alert(e.message)
-    } finally {
-        subkeyLoading.value = false;
-    }
+  subkeyLoading.value = true
+  try {
+    await generateSubkey(key.value.id, subkeyForm.passphrase, subkeyForm.type, subkeyForm.algo, subkeyForm.size, subkeyForm.expiry)
+    showAddSubkey.value = false
+    subkeyForm.passphrase = ''
+    await refreshSubkeys()
+    notify('Subkey added to your key')
+  } catch (e) {
+    notify(e.message, 'error')
+  } finally {
+    subkeyLoading.value = false
+  }
 }
 
-useHead({
-  title: computed(() => key.value ? `Manage ${key.value.name} - VimPGP` : 'Manage Key')
-})
+useHead({ title: computed(() => (key.value ? `Manage ${key.value.name} - VimPGP` : 'Manage Key')) })
 </script>
 
 <style scoped>
-.gap-3 { gap: 12px; }
-.gap-6 { gap: 24px; }
-.w-fit { width: fit-content; }
-
-.bg-black-alpha-40 {
-  background-color: rgba(0, 0, 0, 0.4);
-}
-
-.bg-glow {
+.header-glow {
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(var(--v-theme-primary), 0.1) 0%, transparent 70%);
+  top: -60%;
+  left: -10%;
+  width: 50%;
+  height: 220%;
+  background: radial-gradient(circle, rgba(var(--v-theme-primary), 0.12) 0%, transparent 65%);
   pointer-events: none;
-  z-index: 0;
 }
 
-.shadow-glow {
-  box-shadow: 0 4px 20px rgba(var(--v-theme-primary), 0.3) !important;
-}
+.danger-zone { border-color: rgba(var(--v-theme-error), 0.25) !important; }
 
-.grey-text {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.65rem;
-  letter-spacing: 1.5px;
-}
-
-.custom-table :deep(th) {
-  border-bottom: 2px solid rgba(255, 255, 255, 0.05) !important;
-}
-
-.custom-table :deep(td) {
-  padding: 20px 16px !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
-}
-
-.table-row {
-  transition: background-color 0.2s ease;
-}
-
-.table-row:hover {
-  background-color: rgba(255, 255, 255, 0.02) !important;
-}
-
-.border-error-muted {
-  border: 1px solid rgba(var(--v-theme-error), 0.2) !important;
-}
-
-.line-height-relaxed {
-  line-height: 1.6;
-}
-
-.custom-input :deep(.v-field) {
-  background: rgba(255, 255, 255, 0.03) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-}
-
-.tracking-tighter {
-  letter-spacing: -2px;
-}
+.v-table :deep(th) { border-bottom: 1px solid var(--hairline) !important; }
+.v-table :deep(td) { border-bottom: 1px solid var(--hairline) !important; padding-top: 14px !important; padding-bottom: 14px !important; }
+.v-table :deep(tbody tr:hover) { background: var(--card-bg-hover); }
 </style>

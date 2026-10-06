@@ -1,25 +1,59 @@
 import * as openpgp from 'openpgp';
 
-const getEccCurve = (size: number): string => {
+type KeyAlgo = 'ecc' | 'rsa';
+
+interface AlgoOptions {
+    type: 'ecc' | 'rsa' | 'curve25519';
+    curve?: openpgp.EllipticCurveName;
+    rsaBits?: number;
+}
+
+const NIST_CURVES: Record<number, openpgp.EllipticCurveName> = {
+    256: 'nistP256',
+    384: 'nistP384',
+    521: 'nistP521',
+};
+
+/**
+ * Translate the UI's algorithm/size selection into valid OpenPGP v6 key options.
+ * - ECC size 25519 -> modern `curve25519` type (ed25519/x25519, non-legacy).
+ * - ECC size 256/384/521 -> NIST `ecc` curves.
+ * - RSA -> clamped to the OpenPGP minimum of 2048 bits.
+ */
+const buildAlgoOptions = (algo: KeyAlgo, size: number): AlgoOptions => {
+    if (algo === 'rsa') {
+        return { type: 'rsa', rsaBits: Math.max(2048, size || 4096) };
+    }
     if (size === 256 || size === 384 || size === 521) {
-        return `p${size}`;
+        return { type: 'ecc', curve: NIST_CURVES[size] };
     }
-    return 'curve25519';
+    return { type: 'curve25519' };
 };
 
-const generateSecureHex = (len: number): string => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const secureCrypto = typeof window !== 'undefined' ? window.crypto : (globalThis as any).crypto;
-
-    if (secureCrypto?.getRandomValues) {
-        const array = new Uint8Array(len / 2);
-        secureCrypto.getRandomValues(array);
-        return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
-    }
-    throw new Error('Cryptographically secure random number generation is not available in this environment.');
+/** Infer a human-friendly usage label for a (sub)key from its public-key algorithm. */
+const inferUsage = (algorithm: string): string => {
+    const encrypting = ['ecdh', 'x25519', 'x448', 'elgamal', 'rsaEncrypt', 'aeadEncrypt'];
+    if (encrypting.includes(algorithm)) return 'encrypt';
+    if (algorithm === 'rsaEncryptSign') return 'sign';
+    return 'sign';
 };
 
+const toIsoOrNull = (value: Date | typeof Infinity | null): string | null => {
+    if (value instanceof Date) return value.toISOString();
+    return null;
+};
 
+export interface KeyComponentInfo {
+    id: string;
+    fingerprint: string;
+    created: string;
+    algo: string;
+    bits: number;
+    curve: string;
+    isPrimary: boolean;
+    type: string;
+    expiry: string | null;
+}
 
 export interface PgpKeyRecord {
     id: string;
@@ -32,17 +66,6 @@ export interface PgpKeyRecord {
     revocationCertificate: string;
     createdAt: string;
     type: string;
-    subkeys?: {
-        id: string;
-        fingerprint: string;
-        created: string;
-        algo: string;
-        bits: number;
-        curve: string;
-        isPrimary: boolean;
-        type: string;
-        expiry: string | null;
-    }[];
 }
 
 export const usePgp = () => {
@@ -68,29 +91,23 @@ export const usePgp = () => {
         }
     };
 
-    const generate = async (name: string, email: string, passphrase: string, keyType: 'ecc' | 'rsa' = 'ecc', keySize: number = 0, expiry: number = 0) => {
+    const generate = async (
+        name: string,
+        email: string,
+        passphrase: string,
+        keyType: KeyAlgo = 'ecc',
+        keySize: number = 0,
+        expiry: number = 0,
+    ) => {
         loading.value = true;
         try {
-            let curve: string | undefined;
-            let rsaBits: number | undefined;
-
-            if (keyType === 'ecc') {
-                curve = getEccCurve(keySize);
-            } else {
-                rsaBits = keySize || 4096;
-            }
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const options: any = {
+            const options: openpgp.GenerateKeyOptions & { format: 'armored' } = {
                 userIDs: [{ name, email }],
-                passphrase,
                 format: 'armored',
                 keyExpirationTime: expiry,
-                type: keyType,
-                curve,
-                rsaBits
+                ...buildAlgoOptions(keyType, keySize),
             };
-
+            if (passphrase) options.passphrase = passphrase;
 
             const { privateKey, publicKey, revocationCertificate } = await openpgp.generateKey(options);
             const key = await openpgp.readKey({ armoredKey: privateKey });
@@ -106,7 +123,6 @@ export const usePgp = () => {
                 revocationCertificate,
                 createdAt: new Date().toISOString(),
                 type: keyType,
-                subkeys: []
             };
 
             keys.value.push(newKey);
@@ -123,47 +139,46 @@ export const usePgp = () => {
         saveKeys();
     };
 
-    const generateSubkey = async (keyId: string, _passphrase: string, type: 'sign' | 'encrypt' | 'auth', algo: 'rsa' | 'ecc' = 'ecc', size: number = 25519, expiry: number = 0) => {
+    /**
+     * Add a real cryptographic subkey to an existing private key.
+     * The primary key is unlocked (if protected), the subkey is bound, and the
+     * updated key is re-armored (re-encrypting with the same passphrase when needed).
+     */
+    const generateSubkey = async (
+        keyId: string,
+        passphrase: string,
+        type: 'sign' | 'encrypt',
+        algo: KeyAlgo = 'ecc',
+        size: number = 25519,
+        expiry: number = 0,
+    ) => {
         loading.value = true;
         try {
-            await new Promise(r => setTimeout(r, 800));
-
-            const keyIndex = keys.value.findIndex(k => k.id === keyId);
-            if (keyIndex === -1) throw new Error("Key not found");
-
-            let subkeyAlgo = 'RSA';
-            let subkeyBits = size;
-            let subkeyCurve = '';
-
-            if (algo === 'ecc') {
-                subkeyAlgo = 'ECC';
-                subkeyBits = 0;
-                subkeyCurve = getEccCurve(size);
+            const record = keys.value.find(k => k.id === keyId);
+            if (!record) throw new Error('Key not found');
+            if (!record.privateKey) {
+                throw new Error('A private key is required to add a subkey. Public-only keys cannot be modified.');
             }
 
-            let subkeyExpiry: string | null = null;
-            if (expiry > 0) {
-                subkeyExpiry = new Date(Date.now() + expiry * 1000).toISOString();
+            let privateKey = await openpgp.readPrivateKey({ armoredKey: record.privateKey });
+            const wasEncrypted = !privateKey.isDecrypted();
+            if (wasEncrypted) {
+                if (!passphrase) throw new Error('Passphrase is required to unlock this private key.');
+                privateKey = await openpgp.decryptKey({ privateKey, passphrase });
             }
 
-            const newSubkey = {
+            const updated = await privateKey.addSubkey({
+                ...buildAlgoOptions(algo, size),
+                sign: type === 'sign',
+                keyExpirationTime: expiry > 0 ? expiry : 0,
+            });
 
-                id: generateSecureHex(16),
-                fingerprint: generateSecureHex(40),
-                created: new Date().toISOString(),
-                algo: subkeyAlgo,
-                bits: subkeyBits,
-                curve: subkeyCurve,
-                isPrimary: false,
-                type: type,
-                expiry: subkeyExpiry
-            };
+            const finalKey = wasEncrypted
+                ? await openpgp.encryptKey({ privateKey: updated, passphrase })
+                : updated;
 
-
-            const currentKey = keys.value[keyIndex];
-            if (!currentKey) throw new Error("Key record missing");
-            if (!currentKey.subkeys) currentKey.subkeys = [];
-            currentKey.subkeys.push(newSubkey);
+            record.privateKey = finalKey.armor();
+            record.publicKey = finalKey.toPublic().armor();
             saveKeys();
 
             return true;
@@ -172,80 +187,55 @@ export const usePgp = () => {
         }
     };
 
-
-    const getKeyDetails = async (armoredKey: string) => {
+    /** Read the primary key and all real subkeys with accurate algorithm/usage/expiry info. */
+    const getKeyDetails = async (armoredKey: string): Promise<KeyComponentInfo[]> => {
         const key = await openpgp.readKey({ armoredKey });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const allKeys: any[] = [];
+        const components: KeyComponentInfo[] = [];
 
-        // Primary
         const pInfo = key.getAlgorithmInfo();
-        const keyId = key.getKeyID().toHex();
-        const storedKey = keys.value.find(k => k.id === keyId);
-
-        allKeys.push({
-            id: keyId,
+        const pExpiry = await key.getExpirationTime();
+        components.push({
+            id: key.getKeyID().toHex(),
             fingerprint: key.getFingerprint(),
-            created: key.getCreationTime(),
+            created: key.getCreationTime().toISOString(),
             algo: pInfo.algorithm,
-            bits: pInfo.bits,
-            curve: pInfo.curve,
+            bits: pInfo.bits ?? 0,
+            curve: pInfo.curve ?? '',
             isPrimary: true,
             type: 'certify',
-            expiry: null
+            expiry: toIsoOrNull(pExpiry),
         });
 
-        if (key.subkeys) {
-            for (const sub of key.subkeys) {
-                const pkt = sub.keyPacket;
-                allKeys.push({
-                    id: pkt.getKeyID().toHex(),
-                    fingerprint: pkt.getFingerprint(),
-                    created: pkt.created,
-                    algo: 'Subkey',
-                    bits: 0,
-                    curve: '',
-                    isPrimary: false,
-                    type: 'encrypt',
-                    expiry: null
-                });
-            }
-        }
-
-        // Stored "Simulated" Subkeys
-        if (storedKey && storedKey.subkeys) {
-            storedKey.subkeys.forEach(sub => {
-                allKeys.push({
-                    id: sub.id,
-                    fingerprint: sub.fingerprint,
-                    created: sub.created,
-                    algo: sub.algo,
-                    bits: sub.bits,
-                    curve: sub.curve,
-                    isPrimary: false,
-                    type: sub.type,
-                    expiry: sub.expiry
-                });
+        for (const sub of key.getSubkeys()) {
+            const ai = sub.getAlgorithmInfo();
+            const exp = await sub.getExpirationTime();
+            components.push({
+                id: sub.getKeyID().toHex(),
+                fingerprint: sub.getFingerprint(),
+                created: sub.getCreationTime().toISOString(),
+                algo: ai.algorithm,
+                bits: ai.bits ?? 0,
+                curve: ai.curve ?? '',
+                isPrimary: false,
+                type: inferUsage(ai.algorithm),
+                expiry: toIsoOrNull(exp),
             });
         }
 
-        return allKeys;
+        return components;
     };
 
     const encryptMessage = async (message: string, publicKeys: string[], format: 'armored' | 'binary' = 'armored') => {
         loading.value = true;
         try {
             const encryptionKeys = await Promise.all(
-                publicKeys.map(k => openpgp.readKey({ armoredKey: k }))
+                publicKeys.map(k => openpgp.readKey({ armoredKey: k })),
             );
 
-            const msg = await openpgp.createMessage({ text: message });
-
-            // openpgp.encrypt supports 'armored' (string) or 'binary' (Uint8Array)
             const encrypted = await openpgp.encrypt({
-                message: msg,
+                message: await openpgp.createMessage({ text: message }),
                 encryptionKeys,
-                format
+                format,
             });
 
             return encrypted;
@@ -254,24 +244,24 @@ export const usePgp = () => {
         }
     };
 
+    /** Unlock a private key, transparently handling both protected and unprotected keys. */
+    const unlockPrivateKey = async (privateKeyArmored: string, passphrase?: string) => {
+        const privateKey = await openpgp.readPrivateKey({ armoredKey: privateKeyArmored });
+        if (privateKey.isDecrypted()) return privateKey;
+        if (!passphrase) throw new Error('This key is protected. A passphrase is required.');
+        return openpgp.decryptKey({ privateKey, passphrase });
+    };
+
     const decryptMessage = async (encryptedMessage: string, privateKeyArmored: string, passphrase?: string) => {
         loading.value = true;
         try {
-            const privateKey = await openpgp.decryptKey({
-                privateKey: await openpgp.readPrivateKey({ armoredKey: privateKeyArmored }),
-                passphrase
-            });
-
-            const message = await openpgp.readMessage({
-                armoredMessage: encryptedMessage as string
-            });
-
+            const privateKey = await unlockPrivateKey(privateKeyArmored, passphrase);
+            const message = await openpgp.readMessage({ armoredMessage: encryptedMessage });
             const { data: decrypted } = await openpgp.decrypt({
                 message,
-                decryptionKeys: privateKey
+                decryptionKeys: privateKey,
             });
-
-            return decrypted;
+            return decrypted as string;
         } finally {
             loading.value = false;
         }
@@ -280,17 +270,15 @@ export const usePgp = () => {
     const signMessage = async (message: string, privateKeyArmored: string, passphrase?: string) => {
         loading.value = true;
         try {
-            const privateKey = await openpgp.decryptKey({
-                privateKey: await openpgp.readPrivateKey({ armoredKey: privateKeyArmored }),
-                passphrase
-            });
-
+            const privateKey = await unlockPrivateKey(privateKeyArmored, passphrase);
+            // Detached signature (-----BEGIN PGP SIGNATURE-----) so it round-trips
+            // with the Verify tab, which supplies the original message separately.
             const signature = await openpgp.sign({
                 message: await openpgp.createMessage({ text: message }),
                 signingKeys: privateKey,
-                format: 'armored'
+                format: 'armored',
+                detached: true,
             });
-
             return signature;
         } finally {
             loading.value = false;
@@ -304,20 +292,18 @@ export const usePgp = () => {
             const signature = await openpgp.readSignature({ armoredSignature: signatureArmored });
             const msg = await openpgp.createMessage({ text: message });
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const verificationResult: any = await openpgp.verify({
+            const verificationResult = await openpgp.verify({
                 message: msg,
                 signature,
-                verificationKeys: publicKey
+                verificationKeys: publicKey,
             });
 
             if (!verificationResult.signatures || verificationResult.signatures.length === 0) {
                 return false;
             }
 
-            const { verified } = verificationResult.signatures[0];
             try {
-                await verified;
+                await verificationResult.signatures[0].verified;
                 return true;
             } catch (e) {
                 console.error('Signature verification failed', e);
@@ -333,22 +319,23 @@ export const usePgp = () => {
             const key = await openpgp.readKey({ armoredKey });
             const fingerprint = key.getFingerprint();
             const keyId = key.getKeyID().toHex();
-            
-            // Check if already exists
-            if (keys.value.find(k => k.id === keyId)) {
-                throw new Error("Key already exists in keyring");
+
+            if (keys.value.some(k => k.id === keyId)) {
+                throw new Error('Key already exists in keyring');
             }
 
-            const user = key.getUserIDs()[0] || { name: 'Unknown', email: 'unknown' };
+            const user = key.getUserIDs()[0] || 'Unknown';
             const isPrivate = key.isPrivate();
 
             let name = 'Unknown';
             let email = '';
-            if (typeof user === 'string') {
+            // Linear-time parse of "Name <email>" (no catastrophic backtracking).
+            const match = /^([^<]*)<([^>]*)>/.exec(user);
+            if (match) {
+                name = match[1].trim() || 'Unknown';
+                email = match[2].trim();
+            } else if (user) {
                 name = user;
-            } else {
-                name = user.name || 'Unknown';
-                email = user.email || '';
             }
 
             const privateKey = isPrivate ? armoredKey : '';
@@ -364,7 +351,6 @@ export const usePgp = () => {
                 revocationCertificate: '',
                 createdAt: new Date().toISOString(),
                 type: 'imported',
-                subkeys: []
             };
 
             keys.value.push(newKey);
@@ -375,7 +361,7 @@ export const usePgp = () => {
             console.error('Failed to import key', error);
             throw e;
         }
-    }
+    };
 
     return {
         keys,
@@ -389,6 +375,6 @@ export const usePgp = () => {
         decryptMessage,
         signMessage,
         verifySignature,
-        importKey
+        importKey,
     };
 };

@@ -1,378 +1,167 @@
 <template>
-  <div class="py-6">
-    <v-row justify="center">
-      <v-col cols="12" lg="10">
-        <div class="d-flex align-center mb-8">
-          <v-btn icon="mdi-arrow-left" variant="tonal" to="/" class="mr-4 glass-panel-btn" color="primary"/>
-          <div>
-            <h1 class="text-h3 font-weight-black text-logo-white tracking-tighter shadow-text">
-              Secure <span class="text-gradient">Messaging</span>
-            </h1>
-            <div class="text-caption text-disabled uppercase font-weight-bold tracking-widest">Encrypt, Decrypt, Sign & Verify</div>
-          </div>
-        </div>
+  <div>
+    <div class="d-flex align-center ga-3 mb-6">
+      <v-btn icon="mdi-arrow-left" variant="tonal" to="/" color="primary" aria-label="Back to dashboard" />
+      <div>
+        <h1 class="text-h5 text-sm-h4 font-weight-black tracking-tighter">Secure <span class="text-gradient">messaging</span></h1>
+        <div class="eyebrow">Encrypt · Decrypt · Sign · Verify</div>
+      </div>
+    </div>
 
-        <v-tabs v-model="tab" color="primary" align-tabs="start" class="mb-6 custom-tabs" hide-slider>
-          <v-tab value="encrypt" class="rounded-t-lg text-none px-6">
-            <v-icon start>mdi-lock</v-icon> Encrypt
-          </v-tab>
-          <v-tab value="decrypt" class="rounded-t-lg text-none px-6">
-            <v-icon start>mdi-lock-open</v-icon> Decrypt
-          </v-tab>
-          <v-tab value="sign" class="rounded-t-lg text-none px-6">
-            <v-icon start>mdi-pen</v-icon> Sign
-          </v-tab>
-          <v-tab value="verify" class="rounded-t-lg text-none px-6">
-            <v-icon start>mdi-check-decagram</v-icon> Verify
-          </v-tab>
-        </v-tabs>
+    <v-card class="surface-card overflow-hidden">
+      <v-tabs v-model="tab" color="primary" show-arrows class="hairline-b px-2">
+        <v-tab v-for="t in tabs" :key="t.value" :value="t.value" class="text-none font-weight-bold">
+          <v-icon start size="18">{{ t.icon }}</v-icon>{{ t.label }}
+        </v-tab>
+      </v-tabs>
 
-        <v-window v-model="tab" class="glass-card rounded-xl pa-8 border-1 overflow-visible">
-          <!-- ENCRYPT -->
-          <v-window-item value="encrypt">
-            <v-row>
-              <v-col cols="12" md="7">
-                <div class="text-subtitle-1 font-weight-bold mb-4 text-primary">Message to Encrypt</div>
-                <v-textarea
-                  v-model="encryptForm.message"
-                  placeholder="Type your secret message here..."
-                  variant="solo-filled"
-                  rows="8"
-                  class="custom-textarea mb-4"
-                  rounded="lg"
-                  hide-details
-                />
-                
-                <div class="d-flex align-center gap-4 mt-6">
-                  <v-btn
-                    color="primary"
-                    size="large"
-                    class="font-weight-black px-8 rounded-lg"
-                    :loading="loading"
-                    :disabled="!encryptForm.message || !encryptForm.recipientKey"
-                    @click="handleEncrypt"
-                  >
-                    Encrypt Message
-                  </v-btn>
-                  <v-btn variant="tonal" size="large" class="rounded-lg" @click="encryptForm.message = ''">Clear</v-btn>
-                </div>
-              </v-col>
-              
-              <v-col cols="12" md="5">
-                <div class="text-subtitle-1 font-weight-bold mb-4 text-primary">Recipient Public Key</div>
-                <v-select
-                  v-model="encryptForm.recipientKey"
-                  :items="keys"
-                  item-title="name"
-                  item-value="publicKey"
-                  label="Select from Keyring"
-                  variant="solo-filled"
-                  class="mb-4 custom-input"
-                  rounded="lg"
-                  persistent-hint
-                  hint="The message will be encrypted for this identity"
-                >
-                  <template #item="{ props, item }">
-                    <v-list-item v-bind="props" :subtitle="item.raw.email" />
-                  </template>
-                </v-select>
-                
-                <div class="text-caption text-disabled mb-2 uppercase font-weight-bold tracking-widest mt-6">Alternative: Paste Armored Key</div>
-                <v-textarea
-                  v-model="encryptForm.recipientKey"
-                  placeholder="-----BEGIN PGP PUBLIC KEY BLOCK-----..."
-                  variant="solo-filled"
-                  rows="4"
-                  class="custom-textarea text-caption font-mono"
-                  rounded="lg"
-                  hide-details
-                />
-              </v-col>
-            </v-row>
-
-            <v-expand-transition>
-              <div v-if="encryptResult" class="mt-8 pt-8 border-t-1">
-                <div class="d-flex align-center justify-space-between mb-4">
-                  <div class="text-h6 font-weight-black text-success">
-                    <v-icon color="success" class="mr-2">mdi-shield-check</v-icon>Encrypted Successfully
-                  </div>
-                  <v-btn size="small" variant="tonal" color="primary" prepend-icon="mdi-content-copy" @click="copy(encryptResult)">Copy All</v-btn>
-                </div>
-                <div class="pa-4 rounded-lg bg-black-alpha-40 font-mono text-caption overflow-auto text-primary border-primary-light" style="max-height: 300px; white-space: pre-wrap;">
-                  {{ encryptResult }}
-                </div>
+      <v-window v-model="tab" class="pa-5 pa-sm-7">
+        <!-- ENCRYPT -->
+        <v-window-item value="encrypt">
+          <v-row>
+            <v-col cols="12" md="7">
+              <div class="eyebrow mb-3">Message to encrypt</div>
+              <v-textarea v-model="encryptForm.message" placeholder="Type your secret message…" rows="9" />
+              <div class="d-flex ga-3 mt-4">
+                <v-btn color="primary" size="large" class="font-weight-bold px-6" :loading="loading" :disabled="!encryptForm.message || !encryptForm.recipientKey" @click="handleEncrypt">Encrypt</v-btn>
+                <v-btn variant="tonal" size="large" @click="encryptForm.message = ''; encryptResult = ''">Clear</v-btn>
               </div>
-            </v-expand-transition>
-          </v-window-item>
+            </v-col>
+            <v-col cols="12" md="5">
+              <div class="eyebrow mb-3">Recipient public key</div>
+              <v-select
+                v-model="encryptForm.recipientKey"
+                :items="keys"
+                item-title="name"
+                item-value="publicKey"
+                label="Choose from keyring"
+                class="mb-3"
+              >
+                <template #item="{ props, item }">
+                  <v-list-item v-bind="props" :subtitle="item.raw.email" />
+                </template>
+              </v-select>
+              <div class="text-caption text-medium-emphasis mb-2">Or paste an armored public key</div>
+              <v-textarea v-model="encryptForm.recipientKey" placeholder="-----BEGIN PGP PUBLIC KEY BLOCK-----" rows="4" class="font-mono text-caption" />
+            </v-col>
+          </v-row>
+          <ResultBlock v-if="encryptResult" title="Encrypted successfully" icon="mdi-shield-check" color="success" :content="encryptResult" @copy="copy(encryptResult)" />
+        </v-window-item>
 
-          <!-- DECRYPT -->
-          <v-window-item value="decrypt">
-            <v-row>
-              <v-col cols="12" md="7">
-                <div class="text-subtitle-1 font-weight-bold mb-4 text-primary">Encrypted Message (PGP Message)</div>
-                <v-textarea
-                  v-model="decryptForm.encryptedMessage"
-                  placeholder="Paste armored message starting with -----BEGIN PGP MESSAGE-----"
-                  variant="solo-filled"
-                  rows="8"
-                  class="custom-textarea mb-4 font-mono text-caption"
-                  rounded="lg"
-                  hide-details
-                />
-                
-                <div class="d-flex align-center gap-4 mt-6">
-                  <v-btn
-                    color="primary"
-                    size="large"
-                    class="font-weight-black px-8 rounded-lg"
-                    :loading="loading"
-                    :disabled="!decryptForm.encryptedMessage || !decryptForm.privateKey"
-                    @click="handleDecrypt"
-                  >
-                    Decrypt Message
-                  </v-btn>
-                  <v-btn variant="tonal" size="large" class="rounded-lg" @click="decryptForm.encryptedMessage = ''; decryptResult = ''">Clear</v-btn>
-                </div>
-              </v-col>
-              
-              <v-col cols="12" md="5">
-                <div class="text-subtitle-1 font-weight-bold mb-4 text-primary">Your Private Key</div>
-                <v-select
-                  v-model="decryptForm.privateKey"
-                  :items="keys.filter(k => !!k.privateKey)"
-                  item-title="name"
-                  item-value="privateKey"
-                  label="Select from Keyring"
-                  variant="solo-filled"
-                  class="mb-4 custom-input"
-                  rounded="lg"
-                />
-                
-                <v-text-field
-                  v-model="decryptForm.passphrase"
-                  label="Passphrase (if applicable)"
-                  type="password"
-                  variant="solo-filled"
-                  class="mb-4 custom-input"
-                  rounded="lg"
-                  prepend-inner-icon="mdi-key-variant"
-                />
-              </v-col>
-            </v-row>
-
-            <v-expand-transition>
-              <div v-if="decryptResult" class="mt-8 pt-8 border-t-1">
-                <div class="d-flex align-center justify-space-between mb-4">
-                  <div class="text-h6 font-weight-black text-white">
-                    <v-icon color="success" class="mr-2">mdi-lock-open-variant</v-icon>Decrypted Plaintext
-                  </div>
-                  <v-btn size="small" variant="tonal" color="primary" prepend-icon="mdi-content-copy" @click="copy(decryptResult)">Copy Message</v-btn>
-                </div>
-                <div class="pa-6 rounded-lg bg-black-alpha-40 text-body-1 border-1 line-height-relaxed" style="max-height: 400px; overflow-y: auto;">
-                  {{ decryptResult }}
-                </div>
+        <!-- DECRYPT -->
+        <v-window-item value="decrypt">
+          <v-row>
+            <v-col cols="12" md="7">
+              <div class="eyebrow mb-3">Encrypted message</div>
+              <v-textarea v-model="decryptForm.encryptedMessage" placeholder="-----BEGIN PGP MESSAGE-----" rows="9" class="font-mono text-caption" />
+              <div class="d-flex ga-3 mt-4">
+                <v-btn color="primary" size="large" class="font-weight-bold px-6" :loading="loading" :disabled="!decryptForm.encryptedMessage || !decryptForm.privateKey" @click="handleDecrypt">Decrypt</v-btn>
+                <v-btn variant="tonal" size="large" @click="decryptForm.encryptedMessage = ''; decryptResult = ''">Clear</v-btn>
               </div>
-            </v-expand-transition>
-          </v-window-item>
+            </v-col>
+            <v-col cols="12" md="5">
+              <div class="eyebrow mb-3">Your private key</div>
+              <v-select v-model="decryptForm.privateKey" :items="privateKeys" item-title="name" item-value="privateKey" label="Choose from keyring" class="mb-3" />
+              <v-text-field v-model="decryptForm.passphrase" label="Passphrase (if protected)" type="password" prepend-inner-icon="mdi-key-variant" />
+            </v-col>
+          </v-row>
+          <ResultBlock v-if="decryptResult" title="Decrypted plaintext" icon="mdi-lock-open-variant" color="success" :content="decryptResult" mono-off @copy="copy(decryptResult)" />
+        </v-window-item>
 
-          <!-- SIGN -->
-          <v-window-item value="sign">
-            <v-row>
-              <v-col cols="12" md="7">
-                <div class="text-subtitle-1 font-weight-bold mb-4 text-primary">Message to Sign</div>
-                <v-textarea
-                  v-model="signForm.message"
-                  placeholder="Text you want to digitally sign..."
-                  variant="solo-filled"
-                  rows="8"
-                  class="custom-textarea mb-4"
-                  rounded="lg"
-                  hide-details
-                />
-                
-                <div class="d-flex align-center gap-4 mt-6">
-                  <v-btn
-                    color="primary"
-                    size="large"
-                    class="font-weight-black px-8 rounded-lg"
-                    :loading="loading"
-                    :disabled="!signForm.message || !signForm.privateKey"
-                    @click="handleSign"
-                  >
-                    Create Signature
-                  </v-btn>
-                </div>
-              </v-col>
-              
-              <v-col cols="12" md="5">
-                <div class="text-subtitle-1 font-weight-bold mb-4 text-primary">Signing Identity</div>
-                <v-select
-                  v-model="signForm.privateKey"
-                  :items="keys.filter(k => !!k.privateKey)"
-                  item-title="name"
-                  item-value="privateKey"
-                  label="Select Primary Key"
-                  variant="solo-filled"
-                  class="mb-4 custom-input"
-                  rounded="lg"
-                />
-                
-                <v-text-field
-                  v-model="signForm.passphrase"
-                  label="Key Passphrase"
-                  type="password"
-                  variant="solo-filled"
-                  class="mb-4 custom-input"
-                  rounded="lg"
-                />
-              </v-col>
-            </v-row>
-
-            <v-expand-transition>
-              <div v-if="signResult" class="mt-8 pt-8 border-t-1">
-                <div class="text-h6 font-weight-black mb-4"><v-icon class="mr-2" color="primary">mdi-fountain-pen-tip</v-icon>Pgp Signature</div>
-                <div class="pa-4 rounded-lg bg-black-alpha-40 font-mono text-caption overflow-auto text-primary border-primary-light">
-                  {{ signResult }}
-                </div>
+        <!-- SIGN -->
+        <v-window-item value="sign">
+          <v-row>
+            <v-col cols="12" md="7">
+              <div class="eyebrow mb-3">Message to sign</div>
+              <v-textarea v-model="signForm.message" placeholder="Text you want to digitally sign…" rows="9" />
+              <div class="d-flex ga-3 mt-4">
+                <v-btn color="primary" size="large" class="font-weight-bold px-6" :loading="loading" :disabled="!signForm.message || !signForm.privateKey" @click="handleSign">Create signature</v-btn>
               </div>
-            </v-expand-transition>
-          </v-window-item>
+            </v-col>
+            <v-col cols="12" md="5">
+              <div class="eyebrow mb-3">Signing identity</div>
+              <v-select v-model="signForm.privateKey" :items="privateKeys" item-title="name" item-value="privateKey" label="Choose from keyring" class="mb-3" />
+              <v-text-field v-model="signForm.passphrase" label="Passphrase (if protected)" type="password" prepend-inner-icon="mdi-key-variant" />
+            </v-col>
+          </v-row>
+          <ResultBlock v-if="signResult" title="Detached PGP signature" icon="mdi-fountain-pen-tip" color="primary" :content="signResult" :note="'Share this signature together with the original message. Both are needed to verify.'" @copy="copy(signResult)" />
+        </v-window-item>
 
-          <!-- VERIFY -->
-          <v-window-item value="verify">
-            <v-row>
-              <v-col cols="12" md="7">
-                <div class="text-subtitle-1 font-weight-bold mb-4 text-primary">Original Message</div>
-                <v-textarea
-                  v-model="verifyForm.message"
-                  placeholder="The original text that was signed"
-                  variant="solo-filled"
-                  rows="4"
-                  class="custom-textarea mb-6"
-                  rounded="lg"
-                />
-
-                <div class="text-subtitle-1 font-weight-bold mb-4 text-primary">PGP Signature</div>
-                <v-textarea
-                  v-model="verifyForm.signature"
-                  placeholder="-----BEGIN PGP SIGNATURE-----..."
-                  variant="solo-filled"
-                  rows="6"
-                  class="custom-textarea mb-4 font-mono text-caption"
-                  rounded="lg"
-                  hide-details
-                />
-                
-                <div class="mt-6">
-                  <v-btn
-                    color="primary"
-                    size="large"
-                    class="font-weight-black px-8 rounded-lg"
-                    :loading="loading"
-                    :disabled="!verifyForm.message || !verifyForm.signature || !verifyForm.publicKey"
-                    @click="handleVerify"
-                  >
-                    Verify Signature
-                  </v-btn>
-                </div>
-              </v-col>
-              
-              <v-col cols="12" md="5">
-                <div class="text-subtitle-1 font-weight-bold mb-4 text-primary">Author's Public Key</div>
-                <v-select
-                  v-model="verifyForm.publicKey"
-                  :items="keys"
-                  item-title="name"
-                  item-value="publicKey"
-                  label="Trusted identity"
-                  variant="solo-filled"
-                  class="mb-4 custom-input"
-                  rounded="lg"
-                />
-                <v-textarea
-                   v-model="verifyForm.publicKey"
-                   placeholder="Or paste public key here"
-                   variant="solo-filled"
-                   rows="4"
-                   class="custom-textarea font-mono text-caption"
-                   rounded="lg"
-                />
-              </v-col>
-            </v-row>
-
-            <v-expand-transition>
-              <div v-if="verifyResult !== null" class="mt-8 pt-6 border-t-1 text-center">
-                <v-alert
-                  :type="verifyResult ? 'success' : 'error'"
-                  variant="tonal"
-                  class="rounded-xl border-1 py-8"
-                >
-                  <div class="text-h4 font-weight-black mb-2 text-logo-white">
-                    {{ verifyResult ? 'SIGNATURE VALID' : 'SIGNATURE INVALID' }}
-                  </div>
-                  <div class="text-body-1">
-                    {{ verifyResult 
-                      ? 'This message is authentic and has not been tampered with since signing.' 
-                      : 'Authenticity check failed. The message may have been modified or the key is incorrect.' 
-                    }}
-                  </div>
-                </v-alert>
+        <!-- VERIFY -->
+        <v-window-item value="verify">
+          <v-row>
+            <v-col cols="12" md="7">
+              <div class="eyebrow mb-3">Original message</div>
+              <v-textarea v-model="verifyForm.message" placeholder="The exact text that was signed" rows="4" class="mb-4" />
+              <div class="eyebrow mb-3">PGP signature</div>
+              <v-textarea v-model="verifyForm.signature" placeholder="-----BEGIN PGP SIGNATURE-----" rows="6" class="font-mono text-caption" />
+              <div class="mt-4">
+                <v-btn color="primary" size="large" class="font-weight-bold px-6" :loading="loading" :disabled="!verifyForm.message || !verifyForm.signature || !verifyForm.publicKey" @click="handleVerify">Verify signature</v-btn>
               </div>
-            </v-expand-transition>
-          </v-window-item>
-        </v-window>
-      </v-col>
-    </v-row>
+            </v-col>
+            <v-col cols="12" md="5">
+              <div class="eyebrow mb-3">Author's public key</div>
+              <v-select v-model="verifyForm.publicKey" :items="keys" item-title="name" item-value="publicKey" label="Trusted identity" class="mb-3" />
+              <v-textarea v-model="verifyForm.publicKey" placeholder="Or paste a public key" rows="4" class="font-mono text-caption" />
+            </v-col>
+          </v-row>
+          <v-expand-transition>
+            <v-alert v-if="verifyResult !== null" :type="verifyResult ? 'success' : 'error'" variant="tonal" class="mt-6 hairline">
+              <div class="text-h6 font-weight-black mb-1">{{ verifyResult ? 'Signature valid' : 'Signature invalid' }}</div>
+              <div class="text-body-2">
+                {{ verifyResult
+                  ? 'This message is authentic and unmodified since it was signed.'
+                  : 'Verification failed — the message may have been altered, or the key does not match.' }}
+              </div>
+            </v-alert>
+          </v-expand-transition>
+        </v-window-item>
+      </v-window>
+    </v-card>
 
-    <v-snackbar v-model="snackbar" color="success" location="bottom right">
-      {{ snackbarText }}
-    </v-snackbar>
+    <v-snackbar v-model="snackbar" color="success" location="bottom right" rounded="lg">{{ snackbarText }}</v-snackbar>
   </div>
 </template>
 
 <script setup>
 const { keys, encryptMessage, decryptMessage, signMessage, verifySignature, loading } = usePgp()
+
+const tabs = [
+  { value: 'encrypt', label: 'Encrypt', icon: 'mdi-lock' },
+  { value: 'decrypt', label: 'Decrypt', icon: 'mdi-lock-open' },
+  { value: 'sign', label: 'Sign', icon: 'mdi-pen' },
+  { value: 'verify', label: 'Verify', icon: 'mdi-check-decagram' },
+]
+
 const tab = ref('encrypt')
 const snackbar = ref(false)
 const snackbarText = ref('')
 
-const encryptForm = reactive({
-  message: '',
-  recipientKey: ''
-})
+const privateKeys = computed(() => keys.value.filter(k => !!k.privateKey))
+
+const encryptForm = reactive({ message: '', recipientKey: '' })
 const encryptResult = ref('')
-
-const decryptForm = reactive({
-  encryptedMessage: '',
-  privateKey: '',
-  passphrase: ''
-})
+const decryptForm = reactive({ encryptedMessage: '', privateKey: '', passphrase: '' })
 const decryptResult = ref('')
-
-const signForm = reactive({
-  message: '',
-  privateKey: '',
-  passphrase: ''
-})
+const signForm = reactive({ message: '', privateKey: '', passphrase: '' })
 const signResult = ref('')
-
-const verifyForm = reactive({
-  message: '',
-  signature: '',
-  publicKey: ''
-})
+const verifyForm = reactive({ message: '', signature: '', publicKey: '' })
 const verifyResult = ref(null)
 
-const copy = (text) => {
-  navigator.clipboard.writeText(text)
-  snackbarText.value = 'Copied to clipboard'
-  snackbar.value = true
+const copy = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text)
+    snackbarText.value = 'Copied to clipboard'
+    snackbar.value = true
+  } catch {
+    snackbarText.value = 'Clipboard blocked by browser'
+    snackbar.value = true
+  }
 }
 
 const handleEncrypt = async () => {
   try {
-    const res = await encryptMessage(encryptForm.message, [encryptForm.recipientKey])
-    encryptResult.value = res
+    encryptResult.value = await encryptMessage(encryptForm.message, [encryptForm.recipientKey])
   } catch (e) {
     alert('Encryption error: ' + e.message)
   }
@@ -380,17 +169,15 @@ const handleEncrypt = async () => {
 
 const handleDecrypt = async () => {
   try {
-    const res = await decryptMessage(decryptForm.encryptedMessage, decryptForm.privateKey, decryptForm.passphrase)
-    decryptResult.value = res
+    decryptResult.value = await decryptMessage(decryptForm.encryptedMessage, decryptForm.privateKey, decryptForm.passphrase)
   } catch (e) {
-    alert('Decryption error: Ensure your private key and passphrase are correct. Error: ' + e.message)
+    alert('Decryption error: check your private key and passphrase.\n\n' + e.message)
   }
 }
 
 const handleSign = async () => {
   try {
-    const res = await signMessage(signForm.message, signForm.privateKey, signForm.passphrase)
-    signResult.value = res
+    signResult.value = await signMessage(signForm.message, signForm.privateKey, signForm.passphrase)
   } catch (e) {
     alert('Signing error: ' + e.message)
   }
@@ -398,68 +185,12 @@ const handleSign = async () => {
 
 const handleVerify = async () => {
   try {
-    const res = await verifySignature(verifyForm.message, verifyForm.signature, verifyForm.publicKey)
-    verifyResult.value = res
+    verifyResult.value = await verifySignature(verifyForm.message, verifyForm.signature, verifyForm.publicKey)
   } catch (e) {
     verifyResult.value = false
     alert('Verification error: ' + e.message)
   }
 }
 
-useHead({
-  title: 'Secure Messages - VimPGP'
-})
+useHead({ title: 'Secure Messages - VimPGP' })
 </script>
-
-<style scoped>
-.custom-tabs :deep(.v-tab) {
-  background: rgba(255, 255, 255, 0.03);
-  margin-right: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-bottom: none;
-  opacity: 0.6;
-  transition: all 0.3s ease;
-}
-
-.custom-tabs :deep(.v-tab--selected) {
-  opacity: 1;
-  background: rgba(var(--v-theme-primary), 0.1);
-  border-color: rgba(var(--v-theme-primary), 0.3);
-}
-
-.custom-textarea :deep(.v-field),
-.custom-input :deep(.v-field) {
-  background: rgba(255, 255, 255, 0.03) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  transition: border-color 0.3s ease;
-}
-
-.custom-textarea :deep(.v-field--focused),
-.custom-input :deep(.v-field--focused) {
-  border-color: rgba(var(--v-theme-primary), 0.5) !important;
-}
-
-.bg-black-alpha-40 {
-  background: rgba(0, 0, 0, 0.4);
-}
-
-.border-t-1 {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.border-primary-light {
-  border: 1px solid rgba(var(--v-theme-primary), 0.2);
-}
-
-.gap-4 {
-  gap: 16px;
-}
-
-.shadow-text {
-  text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
-.line-height-relaxed {
-  line-height: 1.8;
-}
-</style>
